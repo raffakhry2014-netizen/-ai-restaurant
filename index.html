@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bodensee Bistro</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f5f0;
+      color: #222;
+    }
+
+    header {
+      background: #1f4d3b;
+      color: white;
+      padding: 35px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    header p {
+      margin-top: 8px;
+      opacity: 0.85;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-top: 30px;
+    }
+
+    .item {
+      background: white;
+      margin: 12px 0;
+      padding: 16px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .description {
+      color: #666;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .tags {
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .tag {
+      background: #e9eee9;
+      padding: 5px 8px;
+      border-radius: 10px;
+      margin-right: 5px;
+    }
+
+    .ai-box {
+      margin-top: 35px;
+      background: #1f4d3b;
+      color: white;
+      padding: 20px;
+      border-radius: 18px;
+    }
+
+    .ai-box h2 {
+      margin-top: 0;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      background: #e9b949;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    #answer {
+      margin-top: 15px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🍽️ Bodensee Bistro</h1>
+  <p>Konstanz • Your smart dining experience</p>
+</header>
+
+<div class="container">
+
+  <h2>🍔 Burgers</h2>
+
+  <div class="item">
+    <div class="item-top">
+      <span>Classic Burger</span>
+      <span>€17.90</span>
+    </div>
+    <div class="description">
+      Beef burger with cheese, tomato, lettuce and fries.
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="item-top">
+      <span>Veggie Burger</span>
+      <span>€15.90</span>
+    </div>
+    <div class="description">
+      Vegetarian burger with grilled vegetables.
+    </div>
+    <div class="tags">
+      <span class="tag">🌱 Vegetarian</span>
+    </div>
+  </div>
+
+  <h2>🍝 Pasta</h2>
+
+  <div class="item">
+    <div class="item-top">
+      <span>Mushroom Tagliatelle</span>
+      <span>€16.90</span>
+    </div>
+    <div class="description">
+      Creamy pasta with mushrooms and parmesan.
+    </div>
+    <div class="tags">
+      <span class="tag">🌱 Vegetarian</span>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="item-top">
+      <span>Spicy Arrabbiata</span>
+      <span>€14.50</span>
+    </div>
+    <div class="description">
+      Pasta with tomato, garlic and chili.
+    </div>
+    <div class="tags">
+      <span class="tag">🌱 Vegan</span>
+      <span class="tag">🌶️ Spicy</span>
+    </div>
+  </div>
+
+  <h2>🥗 Salads</h2>
+
+  <div class="item">
+    <div class="item-top">
+      <span>Chicken Caesar Salad</span>
+      <span>€15.50</span>
+    </div>
+    <div class="description">
+      Grilled chicken, lettuce, parmesan and croutons.
+    </div>
+  </div>
+
+  <div class="ai-box">
+    <h2>🤖 Ask our AI Waiter</h2>
+
+    <p>
+      Tell me what you like and I'll recommend something.
+    </p>
+
+    <input
+      id="question"
+      placeholder="e.g. Vegetarian under €17"
+    >
+
+    <button onclick="askWaiter()">
+      Ask AI Waiter
+    </button>
+
+    <div id="answer"></div>
+  </div>
+
+</div>
+
+<script>
+function askWaiter() {
+
+  const question =
+    document.getElementById("question").value.toLowerCase();
+
+  let answer = "";
+
+  if (
+    question.includes("vegetarian") ||
+    question.includes("vegetarisch")
+  ) {
+    answer =
+      "🌱 I recommend the Veggie Burger (€15.90) or Mushroom Tagliatelle (€16.90).";
+  }
+
+  else if (
+    question.includes("vegan")
+  ) {
+    answer =
+      "🌱 Spicy Arrabbiata (€14.50) is our vegan option.";
+  }
+
+  else if (
+    question.includes("cheap") ||
+    question.includes("under") ||
+    question.includes("günstig")
+  ) {
+    answer =
+      "💰 The Spicy Arrabbiata at €14.50 is our most affordable main dish.";
+  }
+
+  else {
+    answer =
+      "👋 Tell me your budget and preferences — for example vegetarian, vegan or spicy.";
+  }
+
+  document.getElementById("answer").innerText = answer;
+}
+</script>
+
+</body>
+</html>
