@@ -216,43 +216,42 @@
 </div>
 
 <script>
-function askWaiter() {
+async function askWaiter() {
+  const input = document.getElementById("question");
+  const answerBox = document.getElementById("answer");
+  const message = input.value.trim();
 
-  const question =
-    document.getElementById("question").value.toLowerCase();
-
-  let answer = "";
-
-  if (
-    question.includes("vegetarian") ||
-    question.includes("vegetarisch")
-  ) {
-    answer =
-      "🌱 I recommend the Veggie Burger (€15.90) or Mushroom Tagliatelle (€16.90).";
+  if (!message) {
+    answerBox.innerText = "Bitte geben Sie eine Frage ein.";
+    return;
   }
 
-  else if (
-    question.includes("vegan")
-  ) {
-    answer =
-      "🌱 Spicy Arrabbiata (€14.50) is our vegan option.";
-  }
+  answerBox.innerText = "KIWA denkt nach... 🤖";
 
-  else if (
-    question.includes("cheap") ||
-    question.includes("under") ||
-    question.includes("günstig")
-  ) {
-    answer =
-      "💰 The Spicy Arrabbiata at €14.50 is our most affordable main dish.";
-  }
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: message
+      })
+    });
 
-  else {
-    answer =
-      "👋 Tell me your budget and preferences — for example vegetarian, vegan or spicy.";
-  }
+    const data = await response.json();
 
-  document.getElementById("answer").innerText = answer;
+    if (!response.ok) {
+      throw new Error(data.error || "Server error");
+    }
+
+    answerBox.innerText = data.answer;
+
+  } catch (error) {
+    console.error(error);
+    answerBox.innerText =
+      "Entschuldigung, KIWA ist gerade nicht erreichbar. Bitte versuchen Sie es erneut.";
+  }
 }
 </script>
 
