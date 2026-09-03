@@ -83,10 +83,16 @@ ${restaurantMenu}
       });
     }
 
-    return res.status(200).json({
-      answer: data.output_text || "Entschuldigung, ich konnte keine Antwort erstellen."
-    });
+const answer =
+  data.output
+    ?.flatMap(item => item.content || [])
+    ?.find(content => content.type === "output_text")
+    ?.text ||
+  "Entschuldigung, ich konnte keine Antwort erstellen.";
 
+return res.status(200).json({
+  answer: answer
+});
   } catch (error) {
     console.error(error);
 
