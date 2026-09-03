@@ -76,6 +76,7 @@ ${restaurantMenu}
 
     const data = await response.json();
 
+    console.log("OPENAI RESPONSE:", JSON.stringify(data, null, 2));
     if (!response.ok) {
       console.error("OpenAI error:", data);
       return res.status(500).json({
