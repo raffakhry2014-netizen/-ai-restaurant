@@ -76,15 +76,16 @@ ${restaurantMenu}
 
     const data = await response.json();
 
-    console.log("OPENAI RESPONSE:", JSON.stringify(data, null, 2));
     if (!response.ok) {
       console.error("OpenAI error:", data);
       return res.status(500).json({
         error: "AI service error"
       });
     }
+const answer = data.output?.[0]?.content?.[0]?.text;
+
 return res.status(200).json({
-  answer: JSON.stringify(data, null, 2)
+  answer: answer || "Entschuldigung, ich konnte keine Antwort erstellen."
 });
   } catch (error) {
     console.error(error);
