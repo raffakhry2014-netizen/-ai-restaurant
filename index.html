@@ -70,6 +70,7 @@
       margin-top: 9px;
       font-size: 13px;
       color: #444;
+      line-height: 1.6;
     }
 
     .tags {
@@ -132,10 +133,24 @@
       opacity: 0.92;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     #answer {
       margin-top: 15px;
       line-height: 1.6;
       white-space: pre-wrap;
+    }
+
+    .menu-error {
+      background: #fff2f2;
+      border: 1px solid #e5b3b3;
+      padding: 14px;
+      border-radius: 10px;
+      color: #8a1f1f;
+      margin-top: 20px;
     }
 
     @media (max-width: 600px) {
@@ -184,7 +199,7 @@
       placeholder="e.g. Vegetarian under €17"
     >
 
-    <button onclick="askWaiter()">
+    <button id="askButton" onclick="askWaiter()">
       Ask AI Waiter
     </button>
 
@@ -193,9 +208,9 @@
 
 </div>
 
-<script src="menu-data.js"></script>
+<script type="module">
+  import { menuItems } from "./menu-data.js";
 
-<script>
   const categoryInfo = {
     "Starter": "🥖 Starters",
     "Salad": "🥗 Salads",
@@ -209,14 +224,20 @@
   };
 
   function renderMenu() {
-    const menuContainer = document.getElementById("menu");
+    const menuContainer =
+      document.getElementById("menu");
+
+    menuContainer.innerHTML = "";
 
     if (
-      typeof menuItems === "undefined" ||
-      !Array.isArray(menuItems)
+      !Array.isArray(menuItems) ||
+      menuItems.length === 0
     ) {
-      menuContainer.innerHTML =
-        "<p>Menu data could not be loaded.</p>";
+      menuContainer.innerHTML = `
+        <div class="menu-error">
+          Menu data could not be loaded.
+        </div>
+      `;
       return;
     }
 
@@ -231,13 +252,17 @@
           return;
         }
 
-        const heading = document.createElement("h2");
+        const heading =
+          document.createElement("h2");
+
         heading.textContent = title;
 
         menuContainer.appendChild(heading);
 
         items.forEach(item => {
-          const card = document.createElement("div");
+          const card =
+            document.createElement("div");
+
           card.className = "item";
 
           const tags = [];
@@ -271,34 +296,45 @@
           }
 
           const allergens =
-            item.allergens && item.allergens.length > 0
+            Array.isArray(item.allergens) &&
+            item.allergens.length > 0
               ? item.allergens.join(", ")
               : "No listed allergens";
 
           const ingredients =
-            item.ingredients && item.ingredients.length > 0
+            Array.isArray(item.ingredients) &&
+            item.ingredients.length > 0
               ? item.ingredients.join(", ")
-              : "";
+              : "Not specified";
 
-          const servingSize =
-            item.serving_size
-              ? `Portion: ${item.serving_size}`
-              : "";
+          const detailParts = [];
 
-          const prepTime =
-            item.prep_time
-              ? `Prep: ~${item.prep_time} min`
-              : "";
+          if (item.serving_size) {
+            detailParts.push(
+              `Portion: ${item.serving_size}`
+            );
+          }
 
-          const detailParts = [
-            servingSize,
-            prepTime
-          ].filter(Boolean);
+          if (item.prep_time) {
+            detailParts.push(
+              `Prep: ~${item.prep_time} min`
+            );
+          }
+
+          const fat =
+            typeof item.fat === "number"
+              ? item.fat
+              : 0;
+
+          const carbs =
+            typeof item.carbs === "number"
+              ? item.carbs
+              : 0;
 
           card.innerHTML = `
             <div class="item-top">
               <span>${item.name}</span>
-              <span>€${item.price.toFixed(2)}</span>
+              <span>€${Number(item.price).toFixed(2)}</span>
             </div>
 
             <div class="description">
@@ -310,9 +346,9 @@
               &nbsp;•&nbsp;
               💪 ${item.protein}g protein
               &nbsp;•&nbsp;
-              🥑 ${item.fat}g fat
+              🥑 ${fat}g fat
               &nbsp;•&nbsp;
-              🍞 ${item.carbs}g carbs
+              🍞 ${carbs}g carbs
             </div>
 
             ${
@@ -357,14 +393,15 @@
     );
   }
 
-  renderMenu();
-
   async function askWaiter() {
     const input =
       document.getElementById("question");
 
     const answerBox =
       document.getElementById("answer");
+
+    const askButton =
+      document.getElementById("askButton");
 
     const message =
       input.value.trim();
@@ -377,6 +414,8 @@
 
     answerBox.innerText =
       "KIWA denkt nach... 🤖";
+
+    askButton.disabled = true;
 
     try {
       const response =
@@ -400,15 +439,20 @@
       }
 
       answerBox.innerText =
-        data.answer;
+        data.answer ||
+        "No answer received.";
 
     } catch (error) {
       console.error(error);
 
       answerBox.innerText =
         "Entschuldigung, KIWA ist gerade nicht erreichbar. Bitte versuchen Sie es erneut.";
+    } finally {
+      askButton.disabled = false;
     }
   }
+
+  window.askWaiter = askWaiter;
 
   document
     .getElementById("question")
@@ -420,6 +464,8 @@
         }
       }
     );
+
+  renderMenu();
 </script>
 
 </body>
