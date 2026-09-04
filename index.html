@@ -3,168 +3,626 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Kiwan Fakhri Restaurant</title>
 
+  <meta
+    name="description"
+    content="Smart digital restaurant menu with AI waiter in Konstanz."
+  >
+
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f5f0;
-      color: #222;
+    * {
+      box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f6f4ef;
+      color: #1f1f1f;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
     header {
-      background: #1f4d3b;
+      background:
+        linear-gradient(
+          135deg,
+          #163d30,
+          #245e49
+        );
+
       color: white;
-      padding: 35px 20px;
       text-align: center;
+      padding: 38px 20px 42px;
     }
 
     .logo {
-      width: 150px;
-      height: 150px;
+      width: 145px;
+      height: 145px;
       object-fit: cover;
       border-radius: 50%;
-      margin-bottom: 15px;
+      margin-bottom: 14px;
+
+      border: 4px solid rgba(255,255,255,0.18);
+
+      box-shadow:
+        0 8px 25px rgba(0,0,0,0.18);
+    }
+
+    header h1 {
+      margin: 4px 0 0;
+      font-size: 31px;
     }
 
     header p {
-      margin-top: 8px;
-      opacity: 0.85;
+      margin: 10px 0 0;
+      opacity: 0.9;
+      font-size: 15px;
     }
+
+    /* =========================
+       MAIN
+    ========================= */
 
     .container {
-      max-width: 700px;
+      max-width: 1100px;
       margin: auto;
-      padding: 20px;
+      padding: 26px 20px 60px;
     }
 
-    h2 {
-      margin-top: 30px;
+    /* =========================
+       AI WAITER
+    ========================= */
+
+    .ai-box {
+      background:
+        linear-gradient(
+          135deg,
+          #1f513f,
+          #173f32
+        );
+
+      color: white;
+
+      padding: 24px;
+
+      border-radius: 22px;
+
+      margin-bottom: 30px;
+
+      box-shadow:
+        0 8px 25px rgba(31,77,59,0.16);
     }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ai-icon {
+      font-size: 30px;
+    }
+
+    .ai-box h2 {
+      margin: 0;
+      font-size: 25px;
+    }
+
+    .ai-box p {
+      margin: 10px 0 18px;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+
+    .ai-input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    #question {
+      flex: 1;
+
+      min-width: 0;
+
+      padding: 14px 15px;
+
+      border: none;
+      border-radius: 12px;
+
+      font-size: 16px;
+
+      outline: none;
+    }
+
+    #askButton {
+      border: none;
+
+      background: #efbb43;
+
+      padding: 0 24px;
+
+      border-radius: 12px;
+
+      font-weight: bold;
+      font-size: 15px;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.15s ease,
+        opacity 0.15s ease;
+    }
+
+    #askButton:hover {
+      transform: translateY(-1px);
+    }
+
+    #askButton:disabled {
+      opacity: 0.6;
+      cursor: wait;
+      transform: none;
+    }
+
+    #answer {
+      margin-top: 18px;
+
+      line-height: 1.75;
+
+      white-space: pre-wrap;
+
+      background: rgba(255,255,255,0.08);
+
+      border-radius: 12px;
+
+      padding: 0;
+
+      transition: padding 0.2s ease;
+    }
+
+    #answer:not(:empty) {
+      padding: 15px;
+    }
+
+    /* =========================
+       MENU TITLE
+    ========================= */
+
+    .menu-heading {
+      margin-top: 10px;
+      margin-bottom: 6px;
+
+      font-size: 30px;
+    }
+
+    .menu-subtitle {
+      color: #666;
+
+      margin-top: 0;
+      margin-bottom: 22px;
+
+      line-height: 1.5;
+    }
+
+    /* =========================
+       SEARCH
+    ========================= */
+
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    #menuSearch {
+      width: 100%;
+
+      padding: 15px 45px 15px 16px;
+
+      border: 1px solid #ddd;
+
+      background: white;
+
+      border-radius: 14px;
+
+      font-size: 15px;
+
+      outline: none;
+    }
+
+    #menuSearch:focus {
+      border-color: #1f513f;
+
+      box-shadow:
+        0 0 0 3px rgba(31,81,63,0.08);
+    }
+
+    .search-icon {
+      position: absolute;
+
+      right: 16px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      pointer-events: none;
+    }
+
+    /* =========================
+       CATEGORY FILTER
+    ========================= */
+
+    .category-filter {
+      display: flex;
+
+      gap: 8px;
+
+      overflow-x: auto;
+
+      padding-bottom: 10px;
+
+      margin-bottom: 25px;
+
+      scrollbar-width: thin;
+    }
+
+    .category-button {
+      flex: 0 0 auto;
+
+      border: 1px solid #d8ddd9;
+
+      background: white;
+
+      padding: 9px 14px;
+
+      border-radius: 999px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      transition: 0.2s ease;
+    }
+
+    .category-button:hover {
+      border-color: #1f513f;
+    }
+
+    .category-button.active {
+      background: #1f513f;
+      color: white;
+      border-color: #1f513f;
+    }
+
+    /* =========================
+       CATEGORY
+    ========================= */
+
+    .category-section {
+      margin-bottom: 35px;
+    }
+
+    .category-title {
+      font-size: 24px;
+
+      margin: 26px 0 14px;
+
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* =========================
+       GRID
+    ========================= */
+
+    .menu-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 18px;
+    }
+
+    /* =========================
+       MENU CARD
+    ========================= */
 
     .item {
+      overflow: hidden;
+
       background: white;
-      margin: 12px 0;
-      padding: 16px;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+      border-radius: 18px;
+
+      border: 1px solid rgba(0,0,0,0.04);
+
+      box-shadow:
+        0 4px 16px rgba(0,0,0,0.07);
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .item:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 8px 24px rgba(0,0,0,0.10);
+    }
+
+    /* =========================
+       IMAGE
+    ========================= */
+
+    .food-image {
+      position: relative;
+
+      width: 100%;
+
+      height: 220px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #e8eee9,
+          #d8e3dc
+        );
+
+      overflow: hidden;
+    }
+
+    .food-image img {
+      position: absolute;
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+
+      z-index: 2;
+    }
+
+    .image-placeholder {
+      position: absolute;
+
+      inset: 0;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      font-size: 60px;
+
+      z-index: 1;
+    }
+
+    /* =========================
+       CARD CONTENT
+    ========================= */
+
+    .item-content {
+      padding: 17px;
     }
 
     .item-top {
       display: flex;
+
       justify-content: space-between;
-      gap: 15px;
-      font-weight: bold;
+
+      align-items: flex-start;
+
+      gap: 12px;
+    }
+
+    .item-name {
       font-size: 18px;
+
+      font-weight: 700;
+
+      line-height: 1.25;
+    }
+
+    .price {
+      color: #1f513f;
+
+      font-weight: 800;
+
+      font-size: 18px;
+
+      white-space: nowrap;
     }
 
     .description {
       color: #666;
+
       margin-top: 8px;
+
       font-size: 14px;
-      line-height: 1.5;
+
+      line-height: 1.55;
     }
+
+    /* =========================
+       NUTRITION
+    ========================= */
 
     .nutrition {
-      margin-top: 9px;
-      font-size: 13px;
-      color: #444;
-      line-height: 1.6;
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 7px;
+
+      margin-top: 13px;
     }
 
+    .nutrition-chip {
+      background: #f3f4f2;
+
+      border-radius: 8px;
+
+      padding: 6px 8px;
+
+      font-size: 12px;
+
+      color: #444;
+    }
+
+    /* =========================
+       TAGS
+    ========================= */
+
     .tags {
-      margin-top: 12px;
       display: flex;
+
       flex-wrap: wrap;
+
       gap: 6px;
+
+      margin-top: 12px;
     }
 
     .tag {
-      background: #e9eee9;
+      background: #e9f1ec;
+
+      color: #24503f;
+
       padding: 5px 8px;
-      border-radius: 10px;
+
+      border-radius: 9px;
+
       font-size: 12px;
+
+      font-weight: 600;
     }
 
-    .details {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #777;
-      line-height: 1.5;
+    /* =========================
+       DETAILS
+    ========================= */
+
+    details {
+      margin-top: 14px;
+
+      border-top: 1px solid #eee;
+
+      padding-top: 11px;
     }
 
-    .ai-box {
-      margin-top: 40px;
-      margin-bottom: 30px;
-      background: #1f4d3b;
-      color: white;
-      padding: 20px;
-      border-radius: 18px;
-    }
-
-    .ai-box h2 {
-      margin-top: 0;
-    }
-
-    input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      background: #e9b949;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
+    summary {
       cursor: pointer;
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      color: #315a4a;
     }
 
-    button:hover {
-      opacity: 0.92;
-    }
+    .details-content {
+      margin-top: 10px;
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+      font-size: 12px;
 
-    #answer {
-      margin-top: 15px;
+      color: #666;
+
       line-height: 1.6;
-      white-space: pre-wrap;
     }
 
-    .menu-error {
-      background: #fff2f2;
-      border: 1px solid #e5b3b3;
-      padding: 14px;
-      border-radius: 10px;
-      color: #8a1f1f;
-      margin-top: 20px;
+    .details-line {
+      margin-top: 6px;
     }
 
-    @media (max-width: 600px) {
-      .container {
-        padding: 14px;
-      }
+    /* =========================
+       EMPTY STATE
+    ========================= */
 
-      .item-top {
-        font-size: 16px;
+    .empty-state {
+      text-align: center;
+
+      background: white;
+
+      border-radius: 16px;
+
+      padding: 35px 20px;
+
+      color: #777;
+
+      box-shadow:
+        0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+      text-align: center;
+
+      padding: 30px 20px;
+
+      color: #777;
+
+      font-size: 13px;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 720px) {
+
+      header {
+        padding: 28px 15px 32px;
       }
 
       .logo {
-        width: 120px;
-        height: 120px;
+        width: 115px;
+        height: 115px;
+      }
+
+      header h1 {
+        font-size: 25px;
+      }
+
+      .container {
+        padding:
+          18px 13px 45px;
+      }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .food-image {
+        height: 210px;
+      }
+
+      .ai-input-row {
+        flex-direction: column;
+      }
+
+      #askButton {
+        width: 100%;
+        padding: 14px;
+      }
+
+      .menu-heading {
+        font-size: 26px;
+      }
+
+      .category-title {
+        font-size: 21px;
       }
     }
   </style>
@@ -173,300 +631,967 @@
 <body>
 
 <header>
+
   <img
     src="logo.png"
     alt="Kiwan Fakhri Restaurant"
     class="logo"
   >
 
-  <p>Konstanz • Your smart dining experience</p>
+  <h1>
+    Kiwan Fakhri Restaurant
+  </h1>
+
+  <p>
+    Konstanz • Your smart dining experience
+  </p>
+
 </header>
 
-<div class="container">
+
+<main class="container">
+
+  <!-- =========================
+       AI WAITER
+  ========================== -->
+
+  <section class="ai-box">
+
+    <div class="ai-header">
+
+      <div class="ai-icon">
+        🤖
+      </div>
+
+      <h2>
+        Ask our AI Waiter
+      </h2>
+
+    </div>
+
+    <p>
+      Tell me what you like, your budget or dietary preference,
+      and I'll recommend something from our menu.
+    </p>
+
+    <div class="ai-input-row">
+
+      <input
+        id="question"
+        type="text"
+        dir="auto"
+        autocomplete="off"
+        placeholder="e.g. High protein under €20"
+      >
+
+      <button
+        id="askButton"
+        type="button"
+      >
+        Ask KIWA
+      </button>
+
+    </div>
+
+    <div
+      id="answer"
+      dir="auto"
+    ></div>
+
+  </section>
+
+
+  <!-- =========================
+       MENU
+  ========================== -->
+
+  <h2 class="menu-heading">
+    Our Menu
+  </h2>
+
+  <p class="menu-subtitle">
+    Explore the menu or ask KIWA to find the best option for you.
+  </p>
+
+
+  <!-- SEARCH -->
+
+  <div class="search-box">
+
+    <input
+      id="menuSearch"
+      type="search"
+      placeholder="Search dishes, ingredients or preferences..."
+    >
+
+    <span class="search-icon">
+      🔎
+    </span>
+
+  </div>
+
+
+  <!-- CATEGORY FILTER -->
+
+  <div
+    id="categoryFilter"
+    class="category-filter"
+  ></div>
+
+
+  <!-- MENU ITEMS -->
 
   <div id="menu"></div>
 
-  <div class="ai-box">
-    <h2>🤖 Ask our AI Waiter</h2>
+</main>
 
-    <p>
-      Tell me what you like and I'll recommend something.
-    </p>
 
-    <input
-      id="question"
-      type="text"
-      placeholder="e.g. Vegetarian under €17"
-    >
+<footer>
+  Nutritional values are approximate.
+  For allergy information, please confirm with restaurant staff.
+</footer>
 
-    <button id="askButton" onclick="askWaiter()">
-      Ask AI Waiter
-    </button>
-
-    <div id="answer"></div>
-  </div>
-
-</div>
 
 <script type="module">
-  import { menuItems } from "./menu-data.js";
+
+  import {
+    menuItems
+  } from "./menu-data.js";
+
+
+  /* =========================
+     CATEGORY SETTINGS
+  ========================= */
 
   const categoryInfo = {
-    "Starter": "🥖 Starters",
-    "Salad": "🥗 Salads",
-    "Burger": "🍔 Burgers",
-    "Main": "🥩 Main Courses",
-    "Pasta": "🍝 Pasta",
-    "Vegan": "🌱 Vegan & Vegetarian",
-    "Dessert": "🍰 Desserts",
-    "Cold Drink": "🥤 Cold Drinks",
-    "Hot Drink": "☕ Hot Drinks"
+
+    "Starter": {
+      title: "Starters",
+      emoji: "🥖"
+    },
+
+    "Salad": {
+      title: "Salads",
+      emoji: "🥗"
+    },
+
+    "Burger": {
+      title: "Burgers",
+      emoji: "🍔"
+    },
+
+    "Main": {
+      title: "Main Courses",
+      emoji: "🥩"
+    },
+
+    "Pasta": {
+      title: "Pasta",
+      emoji: "🍝"
+    },
+
+    "Vegan": {
+      title: "Vegan & Vegetarian",
+      emoji: "🌱"
+    },
+
+    "Dessert": {
+      title: "Desserts",
+      emoji: "🍰"
+    },
+
+    "Cold Drink": {
+      title: "Cold Drinks",
+      emoji: "🥤"
+    },
+
+    "Hot Drink": {
+      title: "Hot Drinks",
+      emoji: "☕"
+    }
+
   };
 
+
+  /* =========================
+     STATE
+  ========================= */
+
+  let activeCategory = "All";
+
+  let searchText = "";
+
+
+  /* =========================
+     DOM
+  ========================= */
+
+  const menuContainer =
+    document.getElementById("menu");
+
+  const categoryFilter =
+    document.getElementById("categoryFilter");
+
+  const searchInput =
+    document.getElementById("menuSearch");
+
+  const questionInput =
+    document.getElementById("question");
+
+  const askButton =
+    document.getElementById("askButton");
+
+  const answerBox =
+    document.getElementById("answer");
+
+
+  /* =========================
+     CATEGORY FILTER BUTTONS
+  ========================= */
+
+  function createCategoryFilters() {
+
+    categoryFilter.innerHTML = "";
+
+    const categories = [
+      "All",
+      ...Object.keys(categoryInfo)
+    ];
+
+    categories.forEach(category => {
+
+      const button =
+        document.createElement("button");
+
+      button.className =
+        "category-button";
+
+      if (category === activeCategory) {
+        button.classList.add("active");
+      }
+
+      if (category === "All") {
+
+        button.textContent =
+          "🍽️ All";
+
+      } else {
+
+        button.textContent =
+          `${categoryInfo[category].emoji} ${categoryInfo[category].title}`;
+
+      }
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          activeCategory = category;
+
+          createCategoryFilters();
+
+          renderMenu();
+
+        }
+      );
+
+      categoryFilter.appendChild(button);
+
+    });
+
+  }
+
+
+  /* =========================
+     SEARCH
+  ========================= */
+
+  function matchesSearch(item) {
+
+    if (!searchText) {
+      return true;
+    }
+
+    const searchableText = [
+
+      item.name,
+
+      item.description,
+
+      item.category,
+
+      item.cuisine,
+
+      item.protein_source,
+
+      ...(item.ingredients || []),
+
+      ...(item.flavors || []),
+
+      ...(item.tags || [])
+
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableText.includes(
+      searchText.toLowerCase()
+    );
+
+  }
+
+
+  /* =========================
+     FILTER ITEMS
+  ========================= */
+
+  function getFilteredItems() {
+
+    return menuItems.filter(item => {
+
+      const categoryMatch =
+        activeCategory === "All" ||
+        item.category === activeCategory;
+
+      return (
+        categoryMatch &&
+        matchesSearch(item)
+      );
+
+    });
+
+  }
+
+
+  /* =========================
+     ITEM TAGS
+  ========================= */
+
+  function getItemTags(item) {
+
+    const tags = [];
+
+    if (item.vegan) {
+
+      tags.push(
+        "🌱 Vegan"
+      );
+
+    } else if (item.vegetarian) {
+
+      tags.push(
+        "🌱 Vegetarian"
+      );
+
+    }
+
+    if (item.gluten_free) {
+
+      tags.push(
+        "🌾 Gluten Free"
+      );
+
+    }
+
+    if (item.spicy_level === 1) {
+
+      tags.push(
+        "🌶️ Mild"
+      );
+
+    }
+
+    if (item.spicy_level === 2) {
+
+      tags.push(
+        "🌶️🌶️ Medium"
+      );
+
+    }
+
+    if (item.spicy_level >= 3) {
+
+      tags.push(
+        "🌶️🌶️🌶️ Hot"
+      );
+
+    }
+
+    if (item.bestseller) {
+
+      tags.push(
+        "⭐ Bestseller"
+      );
+
+    }
+
+    return tags;
+
+  }
+
+
+  /* =========================
+     CARD
+  ========================= */
+
+  function createItemCard(item) {
+
+    const card =
+      document.createElement("article");
+
+    card.className = "item";
+
+
+    const category =
+      categoryInfo[item.category];
+
+
+    const placeholderEmoji =
+      category
+        ? category.emoji
+        : "🍽️";
+
+
+    const tags =
+      getItemTags(item);
+
+
+    const allergens =
+
+      Array.isArray(item.allergens) &&
+      item.allergens.length
+
+        ? item.allergens.join(", ")
+
+        : "No listed allergens";
+
+
+    const ingredients =
+
+      Array.isArray(item.ingredients) &&
+      item.ingredients.length
+
+        ? item.ingredients.join(", ")
+
+        : "Not specified";
+
+
+    const fat =
+
+      typeof item.fat === "number"
+
+        ? item.fat
+
+        : 0;
+
+
+    const carbs =
+
+      typeof item.carbs === "number"
+
+        ? item.carbs
+
+        : 0;
+
+
+    /*
+      IMAGE FILE STRUCTURE:
+
+      images/menu-1.webp
+      images/menu-2.webp
+      ...
+      images/menu-40.webp
+    */
+
+    const imagePath =
+      `images/menu-${item.id}.webp`;
+
+
+    card.innerHTML = `
+
+      <div class="food-image">
+
+        <div class="image-placeholder">
+          ${placeholderEmoji}
+        </div>
+
+        <img
+          src="${imagePath}"
+          alt="${item.name}"
+          loading="lazy"
+        >
+
+      </div>
+
+
+      <div class="item-content">
+
+
+        <div class="item-top">
+
+          <div class="item-name">
+            ${item.name}
+          </div>
+
+          <div class="price">
+            €${Number(item.price).toFixed(2)}
+          </div>
+
+        </div>
+
+
+        <div class="description">
+          ${item.description}
+        </div>
+
+
+        <div class="nutrition">
+
+          <span class="nutrition-chip">
+            🔥 ${item.calories} kcal
+          </span>
+
+          <span class="nutrition-chip">
+            💪 ${item.protein}g protein
+          </span>
+
+          <span class="nutrition-chip">
+            🥑 ${fat}g fat
+          </span>
+
+          <span class="nutrition-chip">
+            🍞 ${carbs}g carbs
+          </span>
+
+        </div>
+
+
+        ${
+          tags.length
+            ? `
+
+              <div class="tags">
+
+                ${tags
+                  .map(
+                    tag =>
+                      `<span class="tag">${tag}</span>`
+                  )
+                  .join("")}
+
+              </div>
+
+            `
+            : ""
+        }
+
+
+        <details>
+
+          <summary>
+            View details
+          </summary>
+
+          <div class="details-content">
+
+            <div class="details-line">
+
+              <strong>
+                Ingredients:
+              </strong>
+
+              ${ingredients}
+
+            </div>
+
+
+            <div class="details-line">
+
+              <strong>
+                Allergens:
+              </strong>
+
+              ${allergens}
+
+            </div>
+
+
+            ${
+              item.serving_size
+                ? `
+
+                  <div class="details-line">
+
+                    <strong>
+                      Portion:
+                    </strong>
+
+                    ${item.serving_size}
+
+                  </div>
+
+                `
+                : ""
+            }
+
+
+            ${
+              item.prep_time
+                ? `
+
+                  <div class="details-line">
+
+                    <strong>
+                      Preparation:
+                    </strong>
+
+                    ~${item.prep_time} min
+
+                  </div>
+
+                `
+                : ""
+            }
+
+
+            ${
+              item.cuisine
+                ? `
+
+                  <div class="details-line">
+
+                    <strong>
+                      Cuisine:
+                    </strong>
+
+                    ${item.cuisine}
+
+                  </div>
+
+                `
+                : ""
+            }
+
+          </div>
+
+        </details>
+
+      </div>
+
+    `;
+
+
+    const image =
+      card.querySelector("img");
+
+
+    image.addEventListener(
+      "error",
+      () => {
+
+        image.style.display =
+          "none";
+
+      }
+    );
+
+
+    return card;
+
+  }
+
+
+  /* =========================
+     RENDER MENU
+  ========================= */
+
   function renderMenu() {
-    const menuContainer =
-      document.getElementById("menu");
 
     menuContainer.innerHTML = "";
+
 
     if (
       !Array.isArray(menuItems) ||
       menuItems.length === 0
     ) {
+
       menuContainer.innerHTML = `
-        <div class="menu-error">
+
+        <div class="empty-state">
+
           Menu data could not be loaded.
+
         </div>
+
       `;
+
       return;
+
     }
 
-    Object.entries(categoryInfo).forEach(
-      ([category, title]) => {
 
-        const items = menuItems.filter(
-          item => item.category === category
+    const filteredItems =
+      getFilteredItems();
+
+
+    if (!filteredItems.length) {
+
+      menuContainer.innerHTML = `
+
+        <div class="empty-state">
+
+          🔎 No menu items match your search.
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const categories =
+
+      activeCategory === "All"
+
+        ? Object.keys(categoryInfo)
+
+        : [activeCategory];
+
+
+    categories.forEach(category => {
+
+
+      const items =
+
+        filteredItems.filter(
+
+          item =>
+            item.category === category
+
         );
 
-        if (items.length === 0) {
-          return;
-        }
 
-        const heading =
-          document.createElement("h2");
-
-        heading.textContent = title;
-
-        menuContainer.appendChild(heading);
-
-        items.forEach(item => {
-          const card =
-            document.createElement("div");
-
-          card.className = "item";
-
-          const tags = [];
-
-          if (item.vegan) {
-            tags.push("🌱 Vegan");
-          } else if (item.vegetarian) {
-            tags.push("🌱 Vegetarian");
-          }
-
-          if (item.gluten_free) {
-            tags.push("🌾 Gluten Free");
-          }
-
-          if (item.spicy_level > 0) {
-            let spiceText = "Mild";
-
-            if (item.spicy_level === 2) {
-              spiceText = "Medium";
-            }
-
-            if (item.spicy_level >= 3) {
-              spiceText = "Hot";
-            }
-
-            tags.push(`🌶️ ${spiceText}`);
-          }
-
-          if (item.bestseller) {
-            tags.push("⭐ Bestseller");
-          }
-
-          const allergens =
-            Array.isArray(item.allergens) &&
-            item.allergens.length > 0
-              ? item.allergens.join(", ")
-              : "No listed allergens";
-
-          const ingredients =
-            Array.isArray(item.ingredients) &&
-            item.ingredients.length > 0
-              ? item.ingredients.join(", ")
-              : "Not specified";
-
-          const detailParts = [];
-
-          if (item.serving_size) {
-            detailParts.push(
-              `Portion: ${item.serving_size}`
-            );
-          }
-
-          if (item.prep_time) {
-            detailParts.push(
-              `Prep: ~${item.prep_time} min`
-            );
-          }
-
-          const fat =
-            typeof item.fat === "number"
-              ? item.fat
-              : 0;
-
-          const carbs =
-            typeof item.carbs === "number"
-              ? item.carbs
-              : 0;
-
-          card.innerHTML = `
-            <div class="item-top">
-              <span>${item.name}</span>
-              <span>€${Number(item.price).toFixed(2)}</span>
-            </div>
-
-            <div class="description">
-              ${item.description}
-            </div>
-
-            <div class="nutrition">
-              🔥 ${item.calories} kcal
-              &nbsp;•&nbsp;
-              💪 ${item.protein}g protein
-              &nbsp;•&nbsp;
-              🥑 ${fat}g fat
-              &nbsp;•&nbsp;
-              🍞 ${carbs}g carbs
-            </div>
-
-            ${
-              tags.length > 0
-                ? `
-                  <div class="tags">
-                    ${tags
-                      .map(
-                        tag =>
-                          `<span class="tag">${tag}</span>`
-                      )
-                      .join("")}
-                  </div>
-                `
-                : ""
-            }
-
-            <div class="details">
-              <strong>Ingredients:</strong>
-              ${ingredients}
-            </div>
-
-            <div class="details">
-              <strong>Allergens:</strong>
-              ${allergens}
-            </div>
-
-            ${
-              detailParts.length > 0
-                ? `
-                  <div class="details">
-                    ${detailParts.join(" • ")}
-                  </div>
-                `
-                : ""
-            }
-          `;
-
-          menuContainer.appendChild(card);
-        });
+      if (!items.length) {
+        return;
       }
-    );
+
+
+      const section =
+        document.createElement("section");
+
+
+      section.className =
+        "category-section";
+
+
+      const heading =
+        document.createElement("h2");
+
+
+      heading.className =
+        "category-title";
+
+
+      heading.textContent =
+
+        `${categoryInfo[category].emoji} ${categoryInfo[category].title}`;
+
+
+      const grid =
+        document.createElement("div");
+
+
+      grid.className =
+        "menu-grid";
+
+
+      items.forEach(item => {
+
+        grid.appendChild(
+          createItemCard(item)
+        );
+
+      });
+
+
+      section.appendChild(
+        heading
+      );
+
+
+      section.appendChild(
+        grid
+      );
+
+
+      menuContainer.appendChild(
+        section
+      );
+
+    });
+
   }
 
+
+  /* =========================
+     AI WAITER
+  ========================= */
+
   async function askWaiter() {
-    const input =
-      document.getElementById("question");
-
-    const answerBox =
-      document.getElementById("answer");
-
-    const askButton =
-      document.getElementById("askButton");
 
     const message =
-      input.value.trim();
+      questionInput.value.trim();
+
 
     if (!message) {
+
       answerBox.innerText =
-        "Bitte geben Sie eine Frage ein.";
+        "Please enter a question.";
+
       return;
+
     }
 
-    answerBox.innerText =
-      "KIWA denkt nach... 🤖";
 
-    askButton.disabled = true;
+    answerBox.innerText =
+      "KIWA is thinking... 🤖";
+
+
+    askButton.disabled =
+      true;
+
+
+    askButton.textContent =
+      "Thinking...";
+
 
     try {
+
       const response =
-        await fetch("/api/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: message
-          })
-        });
+        await fetch(
+          "/api/chat",
+          {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json"
+
+            },
+
+            body:
+              JSON.stringify({
+
+                message
+
+              })
+
+          }
+        );
+
 
       const data =
         await response.json();
 
+
       if (!response.ok) {
+
         throw new Error(
-          data.error || "Server error"
+
+          data.error ||
+          "Server error"
+
         );
+
       }
 
+
       answerBox.innerText =
+
         data.answer ||
-        "No answer received.";
+
+        "KIWA could not create an answer.";
+
 
     } catch (error) {
-      console.error(error);
+
+
+      console.error(
+        error
+      );
+
 
       answerBox.innerText =
-        "Entschuldigung, KIWA ist gerade nicht erreichbar. Bitte versuchen Sie es erneut.";
+
+        "Sorry, KIWA is currently unavailable. Please try again.";
+
+
     } finally {
-      askButton.disabled = false;
+
+
+      askButton.disabled =
+        false;
+
+
+      askButton.textContent =
+        "Ask KIWA";
+
     }
+
   }
 
-  window.askWaiter = askWaiter;
 
-  document
-    .getElementById("question")
-    .addEventListener(
-      "keydown",
-      function(event) {
-        if (event.key === "Enter") {
-          askWaiter();
-        }
+  /* =========================
+     EVENTS
+  ========================= */
+
+  searchInput.addEventListener(
+    "input",
+    event => {
+
+      searchText =
+        event.target.value.trim();
+
+      renderMenu();
+
+    }
+  );
+
+
+  askButton.addEventListener(
+    "click",
+    askWaiter
+  );
+
+
+  questionInput.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter") {
+
+        askWaiter();
+
       }
-    );
+
+    }
+  );
+
+
+  /* =========================
+     START
+  ========================= */
+
+  createCategoryFilters();
 
   renderMenu();
+
 </script>
+
 
 </body>
 </html>
