@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1,
+    "name": "Garlic Bread",
+    "filename": "menu-1.webp"
+  },
+  {
+    "id": 2,
+    "name": "Bruschetta Classica",
+    "filename": "menu-2.webp"
+  },
+  {
+    "id": 3,
+    "name": "Mozzarella Sticks",
+    "filename": "menu-3.webp"
+  },
+  {
+    "id": 4,
+    "name": "Chicken Wings",
+    "filename": "menu-4.webp"
+  },
+  {
+    "id": 5,
+    "name": "Crispy Calamari",
+    "filename": "menu-5.webp"
+  },
+  {
+    "id": 6,
+    "name": "Chicken Caesar Salad",
+    "filename": "menu-6.webp"
+  },
+  {
+    "id": 7,
+    "name": "Greek Salad",
+    "filename": "menu-7.webp"
+  },
+  {
+    "id": 8,
+    "name": "Avocado Quinoa Salad",
+    "filename": "menu-8.webp"
+  },
+  {
+    "id": 9,
+    "name": "Tuna Salad",
+    "filename": "menu-9.webp"
+  },
+  {
+    "id": 10,
+    "name": "Classic Burger",
+    "filename": "menu-10.webp"
+  },
+  {
+    "id": 11,
+    "name": "Double Beef Burger",
+    "filename": "menu-11.webp"
+  },
+  {
+    "id": 12,
+    "name": "Spicy Jalapeño Burger",
+    "filename": "menu-12.webp"
+  },
+  {
+    "id": 13,
+    "name": "Crispy Chicken Burger",
+    "filename": "menu-13.webp"
+  },
+  {
+    "id": 14,
+    "name": "Veggie Burger",
+    "filename": "menu-14.webp"
+  },
+  {
+    "id": 15,
+    "name": "Vegan Avocado Burger",
+    "filename": "menu-15.webp"
+  },
+  {
+    "id": 16,
+    "name": "Grilled Chicken Plate",
+    "filename": "menu-16.webp"
+  },
+  {
+    "id": 17,
+    "name": "Beef Steak 250g",
+    "filename": "menu-17.webp"
+  },
+  {
+    "id": 18,
+    "name": "BBQ Ribs",
+    "filename": "menu-18.webp"
+  },
+  {
+    "id": 19,
+    "name": "Chicken Curry",
+    "filename": "menu-19.webp"
+  },
+  {
+    "id": 20,
+    "name": "Beef Teriyaki Bowl",
+    "filename": "menu-20.webp"
+  },
+  {
+    "id": 21,
+    "name": "Mushroom Tagliatelle",
+    "filename": "menu-21.webp"
+  },
+  {
+    "id": 22,
+    "name": "Spicy Arrabbiata",
+    "filename": "menu-22.webp"
+  },
+  {
+    "id": 23,
+    "name": "Chicken Alfredo",
+    "filename": "menu-23.webp"
+  },
+  {
+    "id": 24,
+    "name": "Bolognese",
+    "filename": "menu-24.webp"
+  },
+  {
+    "id": 25,
+    "name": "Pesto Pasta",
+    "filename": "menu-25.webp"
+  },
+  {
+    "id": 26,
+    "name": "Grilled Vegetable Bowl",
+    "filename": "menu-26.webp"
+  },
+  {
+    "id": 27,
+    "name": "Falafel Bowl",
+    "filename": "menu-27.webp"
+  },
+  {
+    "id": 28,
+    "name": "Vegan Curry",
+    "filename": "menu-28.webp"
+  },
+  {
+    "id": 29,
+    "name": "Protein Power Bowl",
+    "filename": "menu-29.webp"
+  },
+  {
+    "id": 30,
+    "name": "Tiramisu",
+    "filename": "menu-30.webp"
+  },
+  {
+    "id": 31,
+    "name": "Chocolate Lava Cake",
+    "filename": "menu-31.webp"
+  },
+  {
+    "id": 32,
+    "name": "Cheesecake",
+    "filename": "menu-32.webp"
+  },
+  {
+    "id": 33,
+    "name": "Fruit Bowl",
+    "filename": "menu-33.webp"
+  },
+  {
+    "id": 34,
+    "name": "Coca-Cola",
+    "filename": "menu-34.webp"
+  },
+  {
+    "id": 35,
+    "name": "Coca-Cola Zero",
+    "filename": "menu-35.webp"
+  },
+  {
+    "id": 36,
+    "name": "Homemade Lemonade",
+    "filename": "menu-36.webp"
+  },
+  {
+    "id": 37,
+    "name": "Fresh Orange Juice",
+    "filename": "menu-37.webp"
+  },
+  {
+    "id": 38,
+    "name": "Espresso",
+    "filename": "menu-38.webp"
+  },
+  {
+    "id": 39,
+    "name": "Cappuccino",
+    "filename": "menu-39.webp"
+  },
+  {
+    "id": 40,
+    "name": "Latte Macchiato",
+    "filename": "menu-40.webp"
+  }
+]
