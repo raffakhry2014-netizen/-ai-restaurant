@@ -1158,3 +1158,5 @@ if (typeof window !== "undefined") {
     getMenuItemByName
   };
 }
+
+export { menuItems };
