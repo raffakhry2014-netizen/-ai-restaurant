@@ -82,8 +82,10 @@ ${restaurantMenu}
         error: "AI service error"
       });
     }
-const answer = data.output?.[0]?.content?.[0]?.text;
-
+const answer = data.output
+  ?.flatMap(item => item.content || [])
+  ?.find(content => content.type === "output_text")
+  ?.text;
 return res.status(200).json({
   answer: answer || "Entschuldigung, ich konnte keine Antwort erstellen."
 });
