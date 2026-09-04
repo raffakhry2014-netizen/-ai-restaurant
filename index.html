@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bodensee Bistro</title>
+  <title>Kiwan Fakhri Restaurant</title>
 
   <style>
     body {
@@ -19,17 +19,13 @@
       padding: 35px 20px;
       text-align: center;
     }
-    .logo {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 15px;
-}
 
-    header h1 {
-      margin: 0;
-      font-size: 32px;
+    .logo {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 15px;
     }
 
     header p {
@@ -38,7 +34,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
       padding: 20px;
     }
@@ -58,6 +54,7 @@
     .item-top {
       display: flex;
       justify-content: space-between;
+      gap: 15px;
       font-weight: bold;
       font-size: 18px;
     }
@@ -66,22 +63,39 @@
       color: #666;
       margin-top: 8px;
       font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .nutrition {
+      margin-top: 9px;
+      font-size: 13px;
+      color: #444;
     }
 
     .tags {
-      margin-top: 10px;
-      font-size: 12px;
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .tag {
       background: #e9eee9;
       padding: 5px 8px;
       border-radius: 10px;
-      margin-right: 5px;
+      font-size: 12px;
+    }
+
+    .details {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #777;
+      line-height: 1.5;
     }
 
     .ai-box {
-      margin-top: 35px;
+      margin-top: 40px;
+      margin-bottom: 30px;
       background: #1f4d3b;
       color: white;
       padding: 20px;
@@ -99,6 +113,7 @@
       border: none;
       border-radius: 10px;
       font-size: 16px;
+      outline: none;
     }
 
     button {
@@ -110,11 +125,32 @@
       border-radius: 10px;
       font-size: 16px;
       font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.92;
     }
 
     #answer {
       margin-top: 15px;
-      line-height: 1.5;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 14px;
+      }
+
+      .item-top {
+        font-size: 16px;
+      }
+
+      .logo {
+        width: 120px;
+        height: 120px;
+      }
     }
   </style>
 </head>
@@ -122,77 +158,18 @@
 <body>
 
 <header>
-<img src="logo.png" alt="Kiwan Fakhri Restaurant" class="logo">
+  <img
+    src="logo.png"
+    alt="Kiwan Fakhri Restaurant"
+    class="logo"
+  >
+
   <p>Konstanz • Your smart dining experience</p>
 </header>
 
 <div class="container">
 
-  <h2>🍔 Burgers</h2>
-
-  <div class="item">
-    <div class="item-top">
-      <span>Classic Burger</span>
-      <span>€17.90</span>
-    </div>
-    <div class="description">
-      Beef burger with cheese, tomato, lettuce and fries.
-    </div>
-  </div>
-
-  <div class="item">
-    <div class="item-top">
-      <span>Veggie Burger</span>
-      <span>€15.90</span>
-    </div>
-    <div class="description">
-      Vegetarian burger with grilled vegetables.
-    </div>
-    <div class="tags">
-      <span class="tag">🌱 Vegetarian</span>
-    </div>
-  </div>
-
-  <h2>🍝 Pasta</h2>
-
-  <div class="item">
-    <div class="item-top">
-      <span>Mushroom Tagliatelle</span>
-      <span>€16.90</span>
-    </div>
-    <div class="description">
-      Creamy pasta with mushrooms and parmesan.
-    </div>
-    <div class="tags">
-      <span class="tag">🌱 Vegetarian</span>
-    </div>
-  </div>
-
-  <div class="item">
-    <div class="item-top">
-      <span>Spicy Arrabbiata</span>
-      <span>€14.50</span>
-    </div>
-    <div class="description">
-      Pasta with tomato, garlic and chili.
-    </div>
-    <div class="tags">
-      <span class="tag">🌱 Vegan</span>
-      <span class="tag">🌶️ Spicy</span>
-    </div>
-  </div>
-
-  <h2>🥗 Salads</h2>
-
-  <div class="item">
-    <div class="item-top">
-      <span>Chicken Caesar Salad</span>
-      <span>€15.50</span>
-    </div>
-    <div class="description">
-      Grilled chicken, lettuce, parmesan and croutons.
-    </div>
-  </div>
+  <div id="menu"></div>
 
   <div class="ai-box">
     <h2>🤖 Ask our AI Waiter</h2>
@@ -203,6 +180,7 @@
 
     <input
       id="question"
+      type="text"
       placeholder="e.g. Vegetarian under €17"
     >
 
@@ -215,44 +193,233 @@
 
 </div>
 
+<script src="menu-data.js"></script>
+
 <script>
-async function askWaiter() {
-  const input = document.getElementById("question");
-  const answerBox = document.getElementById("answer");
-  const message = input.value.trim();
+  const categoryInfo = {
+    "Starter": "🥖 Starters",
+    "Salad": "🥗 Salads",
+    "Burger": "🍔 Burgers",
+    "Main": "🥩 Main Courses",
+    "Pasta": "🍝 Pasta",
+    "Vegan": "🌱 Vegan & Vegetarian",
+    "Dessert": "🍰 Desserts",
+    "Cold Drink": "🥤 Cold Drinks",
+    "Hot Drink": "☕ Hot Drinks"
+  };
 
-  if (!message) {
-    answerBox.innerText = "Bitte geben Sie eine Frage ein.";
-    return;
-  }
+  function renderMenu() {
+    const menuContainer = document.getElementById("menu");
 
-  answerBox.innerText = "KIWA denkt nach... 🤖";
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: message
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Server error");
+    if (
+      typeof menuItems === "undefined" ||
+      !Array.isArray(menuItems)
+    ) {
+      menuContainer.innerHTML =
+        "<p>Menu data could not be loaded.</p>";
+      return;
     }
 
-    answerBox.innerText = data.answer;
+    Object.entries(categoryInfo).forEach(
+      ([category, title]) => {
 
-  } catch (error) {
-    console.error(error);
-    answerBox.innerText =
-      "Entschuldigung, KIWA ist gerade nicht erreichbar. Bitte versuchen Sie es erneut.";
+        const items = menuItems.filter(
+          item => item.category === category
+        );
+
+        if (items.length === 0) {
+          return;
+        }
+
+        const heading = document.createElement("h2");
+        heading.textContent = title;
+
+        menuContainer.appendChild(heading);
+
+        items.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "item";
+
+          const tags = [];
+
+          if (item.vegan) {
+            tags.push("🌱 Vegan");
+          } else if (item.vegetarian) {
+            tags.push("🌱 Vegetarian");
+          }
+
+          if (item.gluten_free) {
+            tags.push("🌾 Gluten Free");
+          }
+
+          if (item.spicy_level > 0) {
+            let spiceText = "Mild";
+
+            if (item.spicy_level === 2) {
+              spiceText = "Medium";
+            }
+
+            if (item.spicy_level >= 3) {
+              spiceText = "Hot";
+            }
+
+            tags.push(`🌶️ ${spiceText}`);
+          }
+
+          if (item.bestseller) {
+            tags.push("⭐ Bestseller");
+          }
+
+          const allergens =
+            item.allergens && item.allergens.length > 0
+              ? item.allergens.join(", ")
+              : "No listed allergens";
+
+          const ingredients =
+            item.ingredients && item.ingredients.length > 0
+              ? item.ingredients.join(", ")
+              : "";
+
+          const servingSize =
+            item.serving_size
+              ? `Portion: ${item.serving_size}`
+              : "";
+
+          const prepTime =
+            item.prep_time
+              ? `Prep: ~${item.prep_time} min`
+              : "";
+
+          const detailParts = [
+            servingSize,
+            prepTime
+          ].filter(Boolean);
+
+          card.innerHTML = `
+            <div class="item-top">
+              <span>${item.name}</span>
+              <span>€${item.price.toFixed(2)}</span>
+            </div>
+
+            <div class="description">
+              ${item.description}
+            </div>
+
+            <div class="nutrition">
+              🔥 ${item.calories} kcal
+              &nbsp;•&nbsp;
+              💪 ${item.protein}g protein
+              &nbsp;•&nbsp;
+              🥑 ${item.fat}g fat
+              &nbsp;•&nbsp;
+              🍞 ${item.carbs}g carbs
+            </div>
+
+            ${
+              tags.length > 0
+                ? `
+                  <div class="tags">
+                    ${tags
+                      .map(
+                        tag =>
+                          `<span class="tag">${tag}</span>`
+                      )
+                      .join("")}
+                  </div>
+                `
+                : ""
+            }
+
+            <div class="details">
+              <strong>Ingredients:</strong>
+              ${ingredients}
+            </div>
+
+            <div class="details">
+              <strong>Allergens:</strong>
+              ${allergens}
+            </div>
+
+            ${
+              detailParts.length > 0
+                ? `
+                  <div class="details">
+                    ${detailParts.join(" • ")}
+                  </div>
+                `
+                : ""
+            }
+          `;
+
+          menuContainer.appendChild(card);
+        });
+      }
+    );
   }
-}
+
+  renderMenu();
+
+  async function askWaiter() {
+    const input =
+      document.getElementById("question");
+
+    const answerBox =
+      document.getElementById("answer");
+
+    const message =
+      input.value.trim();
+
+    if (!message) {
+      answerBox.innerText =
+        "Bitte geben Sie eine Frage ein.";
+      return;
+    }
+
+    answerBox.innerText =
+      "KIWA denkt nach... 🤖";
+
+    try {
+      const response =
+        await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: message
+          })
+        });
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Server error"
+        );
+      }
+
+      answerBox.innerText =
+        data.answer;
+
+    } catch (error) {
+      console.error(error);
+
+      answerBox.innerText =
+        "Entschuldigung, KIWA ist gerade nicht erreichbar. Bitte versuchen Sie es erneut.";
+    }
+  }
+
+  document
+    .getElementById("question")
+    .addEventListener(
+      "keydown",
+      function(event) {
+        if (event.key === "Enter") {
+          askWaiter();
+        }
+      }
+    );
 </script>
 
 </body>
