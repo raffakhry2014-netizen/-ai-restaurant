@@ -1040,4 +1040,4 @@ const menuItems = [
   },
 ];
 
-window.menuItems = menuItems;
+
