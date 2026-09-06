@@ -1,7 +1,7 @@
 // KF Restaurant - canonical 40-item menu
 // Browser-compatible JavaScript. Do not add `export` to this file.
 
-const menuItems = [
+globalThis.menuItems = [
   // ========== STARTERS ==========
   {
     id: 1,
