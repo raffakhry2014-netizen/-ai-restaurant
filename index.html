@@ -1,191 +1,1369 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Kiwan Fakhri Restaurant</title>
+
   <style>
-    body{margin:0;font-family:Arial,sans-serif;background:#f7f5f0;color:#222}
-    header{background:#1f4d3b;color:white;padding:24px 20px 30px;text-align:center}
-    .topbar{max-width:900px;margin:0 auto 14px;display:flex;justify-content:flex-end}
-    .language-select{background:white;color:#222;border:0;border-radius:10px;padding:10px 12px;font-size:15px;min-width:170px}
-    .logo{width:135px;height:135px;object-fit:cover;border-radius:50%;margin-bottom:12px}
-    header p{margin:6px 0 0;opacity:.88}
-    .container{max-width:760px;margin:auto;padding:20px}
-    h2{margin-top:32px}
-    .item{background:white;margin:14px 0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);overflow:hidden}
-    .item-image{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#eee}
-    .item-body{padding:16px}
-    .item-top{display:flex;justify-content:space-between;gap:16px;font-weight:bold;font-size:18px}
-    .description{color:#666;margin-top:8px;font-size:14px;line-height:1.5}
-    .nutrition{margin-top:10px;font-size:13px;color:#444}
-    .tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
-    .tag{background:#e9eee9;padding:5px 8px;border-radius:10px;font-size:12px}
-    .details{margin-top:10px;font-size:12px;color:#777;line-height:1.55}
-    .ai-box{margin:40px 0 30px;background:#1f4d3b;color:white;padding:20px;border-radius:18px}
-    .ai-box h2{margin-top:0}
-    input{width:100%;box-sizing:border-box;padding:14px;border:none;border-radius:10px;font-size:16px;outline:none}
-    button{width:100%;padding:14px;margin-top:10px;background:#e9b949;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer}
-    button:hover{opacity:.92}
-    #answer{margin-top:15px;line-height:1.7;white-space:pre-wrap}
-    html[dir="rtl"] body{text-align:right}
-    html[dir="rtl"] .topbar{justify-content:flex-start}
-    html[dir="rtl"] .item-top{flex-direction:row-reverse}
-    html[dir="rtl"] .tags{justify-content:flex-start}
-    @media(max-width:600px){.container{padding:14px}.item-top{font-size:16px}.logo{width:110px;height:110px}.language-select{min-width:150px}}
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f5f0;
+      color: #222;
+    }
+
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    header {
+      background: #1f4d3b;
+      color: white;
+      padding: 22px 20px 30px;
+      text-align: center;
+    }
+
+    .topbar {
+      max-width: 900px;
+      margin: 0 auto 12px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .language-select {
+      background: white;
+      color: #222;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 15px;
+      min-width: 170px;
+      cursor: pointer;
+    }
+
+    .logo {
+      width: 135px;
+      height: 135px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 12px;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      opacity: 0.9;
+    }
+
+
+    /* =========================
+       MAIN CONTAINER
+    ========================= */
+
+    .container {
+      max-width: 760px;
+      margin: auto;
+      padding: 20px;
+    }
+
+
+    /* =========================
+       AI WAITER
+    ========================= */
+
+    .ai-box {
+      margin: 5px 0 35px;
+      background: #1f4d3b;
+      color: white;
+      border-radius: 18px;
+      overflow: hidden;
+
+      box-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, 0.12);
+    }
+
+
+    .ai-toggle {
+      width: 100%;
+      margin: 0;
+      padding: 18px 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      background: #1f4d3b;
+      color: white;
+
+      border: none;
+      border-radius: 0;
+
+      font-size: 18px;
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+
+    .ai-toggle-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+
+    .ai-robot {
+      font-size: 24px;
+    }
+
+
+    .ai-arrow {
+      font-size: 18px;
+      transition: transform 0.25s ease;
+    }
+
+
+    .ai-box.open .ai-arrow {
+      transform: rotate(180deg);
+    }
+
+
+    .ai-content {
+      display: none;
+      padding: 0 20px 22px;
+    }
+
+
+    .ai-box.open .ai-content {
+      display: block;
+    }
+
+
+    .ai-content h2 {
+      margin: 5px 0 8px;
+      font-size: 22px;
+    }
+
+
+    .ai-content p {
+      margin: 0 0 15px;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+
+    #question {
+      width: 100%;
+      padding: 14px;
+
+      border: none;
+      border-radius: 10px;
+
+      font-size: 16px;
+      outline: none;
+
+      background: white;
+      color: #222;
+    }
+
+
+    #askButton {
+      width: 100%;
+
+      padding: 14px;
+      margin-top: 10px;
+
+      background: #e9b949;
+      color: #111;
+
+      border: none;
+      border-radius: 10px;
+
+      font-size: 16px;
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+
+    #askButton:hover {
+      opacity: 0.92;
+    }
+
+
+    #answer {
+      margin-top: 15px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+
+    /* =========================
+       MENU
+    ========================= */
+
+    #menu h2 {
+      margin-top: 35px;
+      margin-bottom: 15px;
+      font-size: 24px;
+    }
+
+
+    .item {
+      background: white;
+
+      margin: 14px 0;
+
+      border-radius: 16px;
+      overflow: hidden;
+
+      box-shadow:
+        0 2px 10px
+        rgba(0, 0, 0, 0.08);
+    }
+
+
+    .item-image {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+
+      object-fit: cover;
+      display: block;
+
+      background: #eee;
+    }
+
+
+    .item-body {
+      padding: 16px;
+    }
+
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      gap: 16px;
+
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+
+    .item-price {
+      white-space: nowrap;
+      color: #1f4d3b;
+    }
+
+
+    .description {
+      color: #666;
+      margin-top: 8px;
+
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+
+    .nutrition {
+      margin-top: 10px;
+
+      font-size: 13px;
+      color: #444;
+
+      line-height: 1.6;
+    }
+
+
+    .tags {
+      margin-top: 12px;
+
+      display: flex;
+      flex-wrap: wrap;
+
+      gap: 6px;
+    }
+
+
+    .tag {
+      background: #e9eee9;
+
+      padding: 5px 8px;
+
+      border-radius: 10px;
+
+      font-size: 12px;
+    }
+
+
+    .details {
+      margin-top: 10px;
+
+      font-size: 12px;
+      color: #777;
+
+      line-height: 1.55;
+    }
+
+
+    /* =========================
+       RTL
+    ========================= */
+
+    html[dir="rtl"] body {
+      text-align: right;
+    }
+
+
+    html[dir="rtl"] .topbar {
+      justify-content: flex-start;
+    }
+
+
+    html[dir="rtl"] .item-top {
+      flex-direction: row-reverse;
+    }
+
+
+    html[dir="rtl"] .ai-toggle {
+      direction: rtl;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 600px) {
+
+      header {
+        padding: 15px 14px 25px;
+      }
+
+      .container {
+        padding: 14px;
+      }
+
+      .logo {
+        width: 110px;
+        height: 110px;
+      }
+
+      .language-select {
+        min-width: 150px;
+      }
+
+      .item-top {
+        font-size: 16px;
+      }
+
+      .ai-toggle {
+        padding: 16px;
+        font-size: 17px;
+      }
+
+      .ai-content {
+        padding: 0 16px 18px;
+      }
+
+    }
+
   </style>
 </head>
+
+
 <body>
-<header>
-  <div class="topbar">
-    <select id="languageSelect" class="language-select" aria-label="Language">
-      <option value="de">🇩🇪 Deutsch</option>
-      <option value="en">🇬🇧 English</option>
-      <option value="fr">🇫🇷 Français</option>
-      <option value="es">🇪🇸 Español</option>
-      <option value="it">🇮🇹 Italiano</option>
-      <option value="tr">🇹🇷 Türkçe</option>
-      <option value="ar">🇸🇦 العربية</option>
-      <option value="fa">🇮🇷 فارسی</option>
-    </select>
+
+
+  <!-- =========================
+       HEADER
+  ========================== -->
+
+  <header>
+
+    <div class="topbar">
+
+      <select
+        id="languageSelect"
+        class="language-select"
+        aria-label="Language"
+      >
+
+        <option value="de">
+          🇩🇪 Deutsch
+        </option>
+
+        <option value="en">
+          🇬🇧 English
+        </option>
+
+        <option value="fr">
+          🇫🇷 Français
+        </option>
+
+        <option value="es">
+          🇪🇸 Español
+        </option>
+
+        <option value="it">
+          🇮🇹 Italiano
+        </option>
+
+        <option value="tr">
+          🇹🇷 Türkçe
+        </option>
+
+        <option value="ar">
+          🇸🇦 العربية
+        </option>
+
+        <option value="fa">
+          🇮🇷 فارسی
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <img
+      src="logo.png"
+      alt="Kiwan Fakhri Restaurant"
+      class="logo"
+    >
+
+
+    <p id="tagline"></p>
+
+  </header>
+
+
+
+  <!-- =========================
+       CONTENT
+  ========================== -->
+
+  <div class="container">
+
+
+    <!-- AI WAITER -->
+
+    <div
+      class="ai-box"
+      id="aiBox"
+    >
+
+      <button
+        class="ai-toggle"
+        id="aiToggle"
+        type="button"
+      >
+
+        <span class="ai-toggle-left">
+
+          <span class="ai-robot">
+            🤖
+          </span>
+
+          <span id="aiToggleText">
+            Ask KIWA
+          </span>
+
+        </span>
+
+
+        <span class="ai-arrow">
+          ▼
+        </span>
+
+      </button>
+
+
+
+      <div
+        class="ai-content"
+        id="aiContent"
+      >
+
+        <h2 id="aiTitle"></h2>
+
+        <p id="aiIntro"></p>
+
+
+        <input
+          id="question"
+          type="text"
+          autocomplete="off"
+        >
+
+
+        <button
+          id="askButton"
+          type="button"
+        ></button>
+
+
+        <div id="answer"></div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- MENU -->
+
+    <div id="menu"></div>
+
+
   </div>
-  <img src="logo.png" alt="Kiwan Fakhri Restaurant" class="logo">
-  <p id="tagline"></p>
-</header>
 
-<div class="container">
-  <div id="menu"></div>
-  <div class="ai-box">
-    <h2 id="aiTitle"></h2>
-    <p id="aiIntro"></p>
-    <input id="question" type="text">
-    <button id="askButton" onclick="askWaiter()"></button>
-    <div id="answer"></div>
-  </div>
-</div>
 
-<script src="menu-data.js"></script>
-<script src="i18n.js"></script>
-<script>
-const supportedLanguages=["de","en","fr","es","it","tr","ar","fa"];
-let currentLanguage="en";
 
-function detectLanguage(){
-  const saved=localStorage.getItem("restaurant-language");
-  if(saved && supportedLanguages.includes(saved)) return saved;
-  const browser=(navigator.languages?.[0] || navigator.language || "en").toLowerCase();
-  const base=browser.split("-")[0];
-  return supportedLanguages.includes(base) ? base : "en";
-}
+  <!-- =========================
+       DATA FILES
+  ========================== -->
 
-function t(){ return I18N.ui[currentLanguage] || I18N.ui.en; }
+  <script src="menu-data.js"></script>
 
-function setDirection(lang){
-  const rtl=["fa","ar"].includes(lang);
-  document.documentElement.lang=lang;
-  document.documentElement.dir=rtl ? "rtl" : "ltr";
-}
+  <script src="i18n.js"></script>
 
-function translatedName(item){
-  return I18N.itemNames?.[String(item.id)]?.[currentLanguage] || item.name;
-}
 
-function renderMenu(){
-  const menuContainer=document.getElementById("menu");
-  menuContainer.innerHTML="";
-  if(typeof menuItems==="undefined" || !Array.isArray(menuItems)){
-    menuContainer.innerHTML="<p>Menu data could not be loaded.</p>";
-    return;
-  }
 
-  const info=t();
-  const order=["Starter","Salad","Burger","Main","Pasta","Vegan","Dessert","Cold Drink","Hot Drink"];
+  <script>
 
-  order.forEach(category=>{
-    const items=menuItems.filter(item=>item.category===category);
-    if(!items.length) return;
+    /* =========================
+       LANGUAGE
+    ========================== */
 
-    const heading=document.createElement("h2");
-    heading.textContent=info.categories[category] || category;
-    menuContainer.appendChild(heading);
 
-    items.forEach(item=>{
-      const tags=[];
-      if(item.vegan) tags.push(info.tags.vegan);
-      else if(item.vegetarian) tags.push(info.tags.vegetarian);
-      if(item.gluten_free) tags.push(info.tags.gluten_free);
-      if(item.spicy_level>0){
-        tags.push(item.spicy_level===1?info.tags.mild:item.spicy_level===2?info.tags.medium:info.tags.hot);
+    const supportedLanguages = [
+      "de",
+      "en",
+      "fr",
+      "es",
+      "it",
+      "tr",
+      "ar",
+      "fa"
+    ];
+
+
+    let currentLanguage = "en";
+
+
+
+    function detectLanguage() {
+
+      const saved =
+        localStorage.getItem(
+          "restaurant-language"
+        );
+
+
+      if (
+        saved &&
+        supportedLanguages.includes(saved)
+      ) {
+
+        return saved;
+
       }
-      if(item.bestseller) tags.push(info.tags.bestseller);
 
-      const allergens=item.allergens?.length ? item.allergens.join(", ") : info.no_allergens;
-      const ingredients=item.ingredients?.length ? item.ingredients.join(", ") : "";
-      const img=`images/menu-${String(item.id).padStart(2,"0")}.webp`;
 
-      const card=document.createElement("div");
-      card.className="item";
-      card.innerHTML=`
-        <img class="item-image" src="${img}" alt="${translatedName(item)}" loading="lazy"
-             onerror="this.style.display='none'">
-        <div class="item-body">
-          <div class="item-top">
-            <span>${translatedName(item)}</span>
-            <span>€${Number(item.price).toFixed(2)}</span>
-          </div>
-          <div class="description">${item.description || ""}</div>
-          <div class="nutrition">🔥 ${item.calories} kcal &nbsp;•&nbsp; 💪 ${item.protein}g &nbsp;•&nbsp; 🥑 ${item.fat ?? 0}g &nbsp;•&nbsp; 🍞 ${item.carbs ?? 0}g</div>
-          ${tags.length?`<div class="tags">${tags.map(x=>`<span class="tag">${x}</span>`).join("")}</div>`:""}
-          <div class="details"><strong>${info.ingredients}:</strong> ${ingredients}</div>
-          <div class="details"><strong>${info.allergens}:</strong> ${allergens}</div>
-          <div class="details">${item.serving_size?`${info.portion}: ${item.serving_size}`:""}${item.prep_time?` • ${info.prep}: ~${item.prep_time} ${info.minutes}`:""}</div>
-        </div>`;
-      menuContainer.appendChild(card);
-    });
-  });
-}
+      const browserLanguage = (
 
-function applyLanguage(lang){
-  currentLanguage=supportedLanguages.includes(lang)?lang:"en";
-  localStorage.setItem("restaurant-language",currentLanguage);
-  setDirection(currentLanguage);
-  document.getElementById("languageSelect").value=currentLanguage;
-  const info=t();
-  document.getElementById("tagline").textContent=info.tagline;
-  document.getElementById("aiTitle").textContent="🤖 "+info.ai_title;
-  document.getElementById("aiIntro").textContent=info.ai_intro;
-  document.getElementById("question").placeholder=info.placeholder;
-  document.getElementById("askButton").textContent=info.ask;
-  renderMenu();
-}
+        navigator.languages?.[0] ||
 
-async function askWaiter(){
-  const input=document.getElementById("question");
-  const answerBox=document.getElementById("answer");
-  const message=input.value.trim();
-  const info=t();
+        navigator.language ||
 
-  if(!message){answerBox.innerText=info.empty;return;}
-  answerBox.innerText=info.thinking;
+        "en"
 
-  try{
-    const response=await fetch("/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message, language:currentLanguage})
-    });
-    const data=await response.json();
-    if(!response.ok) throw new Error(data.error || "Server error");
-    answerBox.innerText=data.answer;
-  }catch(error){
-    console.error(error);
-    answerBox.innerText=info.error;
-  }
-}
+      ).toLowerCase();
 
-document.getElementById("languageSelect").addEventListener("change",e=>applyLanguage(e.target.value));
-document.getElementById("question").addEventListener("keydown",e=>{if(e.key==="Enter") askWaiter();});
-applyLanguage(detectLanguage());
-</script>
+
+      const baseLanguage =
+        browserLanguage.split("-")[0];
+
+
+      if (
+        supportedLanguages.includes(
+          baseLanguage
+        )
+      ) {
+
+        return baseLanguage;
+
+      }
+
+
+      return "en";
+
+    }
+
+
+
+    function t() {
+
+      return (
+        I18N.ui[currentLanguage] ||
+        I18N.ui.en
+      );
+
+    }
+
+
+
+    function setDirection(language) {
+
+      const rtlLanguages = [
+        "fa",
+        "ar"
+      ];
+
+
+      const rtl =
+        rtlLanguages.includes(language);
+
+
+      document.documentElement.lang =
+        language;
+
+
+      document.documentElement.dir =
+        rtl ? "rtl" : "ltr";
+
+    }
+
+
+
+    function translatedName(item) {
+
+      return (
+
+        I18N.itemNames
+          ?.[String(item.id)]
+          ?.[currentLanguage]
+
+        ||
+
+        item.name
+
+      );
+
+    }
+
+
+
+    /* =========================
+       MENU RENDERING
+    ========================== */
+
+
+    function renderMenu() {
+
+      const menuContainer =
+        document.getElementById("menu");
+
+
+      menuContainer.innerHTML = "";
+
+
+      if (
+        typeof menuItems === "undefined" ||
+        !Array.isArray(menuItems)
+      ) {
+
+        menuContainer.innerHTML =
+          "<p>Menu data could not be loaded.</p>";
+
+        return;
+
+      }
+
+
+      const info = t();
+
+
+      const categoryOrder = [
+
+        "Starter",
+
+        "Salad",
+
+        "Burger",
+
+        "Main",
+
+        "Pasta",
+
+        "Vegan",
+
+        "Dessert",
+
+        "Cold Drink",
+
+        "Hot Drink"
+
+      ];
+
+
+
+      categoryOrder.forEach(
+        category => {
+
+          const items =
+            menuItems.filter(
+              item =>
+                item.category === category
+            );
+
+
+          if (!items.length) {
+            return;
+          }
+
+
+
+          const heading =
+            document.createElement("h2");
+
+
+          heading.textContent =
+            info.categories[category]
+            || category;
+
+
+          menuContainer.appendChild(
+            heading
+          );
+
+
+
+          items.forEach(item => {
+
+
+            const tags = [];
+
+
+            if (item.vegan) {
+
+              tags.push(
+                info.tags.vegan
+              );
+
+            }
+
+            else if (item.vegetarian) {
+
+              tags.push(
+                info.tags.vegetarian
+              );
+
+            }
+
+
+            if (item.gluten_free) {
+
+              tags.push(
+                info.tags.gluten_free
+              );
+
+            }
+
+
+            if (
+              item.spicy_level > 0
+            ) {
+
+              if (
+                item.spicy_level === 1
+              ) {
+
+                tags.push(
+                  info.tags.mild
+                );
+
+              }
+
+              else if (
+                item.spicy_level === 2
+              ) {
+
+                tags.push(
+                  info.tags.medium
+                );
+
+              }
+
+              else {
+
+                tags.push(
+                  info.tags.hot
+                );
+
+              }
+
+            }
+
+
+            if (item.bestseller) {
+
+              tags.push(
+                info.tags.bestseller
+              );
+
+            }
+
+
+
+            const allergens =
+
+              item.allergens?.length
+
+                ? item.allergens.join(", ")
+
+                : info.no_allergens;
+
+
+
+            const ingredients =
+
+              item.ingredients?.length
+
+                ? item.ingredients.join(", ")
+
+                : "";
+
+
+
+            const imageSource =
+
+              `images/menu-${
+
+                String(item.id)
+                  .padStart(2, "0")
+
+              }.webp`;
+
+
+
+            const card =
+              document.createElement("div");
+
+
+            card.className = "item";
+
+
+
+            card.innerHTML = `
+
+              <img
+
+                class="item-image"
+
+                src="${imageSource}"
+
+                alt="${translatedName(item)}"
+
+                loading="lazy"
+
+                onerror="
+                  this.style.display='none'
+                "
+
+              >
+
+
+              <div class="item-body">
+
+
+                <div class="item-top">
+
+                  <span>
+                    ${translatedName(item)}
+                  </span>
+
+                  <span class="item-price">
+                    €${Number(item.price).toFixed(2)}
+                  </span>
+
+                </div>
+
+
+
+                <div class="description">
+
+                  ${item.description || ""}
+
+                </div>
+
+
+
+                <div class="nutrition">
+
+                  🔥 ${item.calories} kcal
+
+                  &nbsp;•&nbsp;
+
+                  💪 ${item.protein}g
+
+                  &nbsp;•&nbsp;
+
+                  🥑 ${item.fat ?? 0}g
+
+                  &nbsp;•&nbsp;
+
+                  🍞 ${item.carbs ?? 0}g
+
+                </div>
+
+
+
+                ${
+                  tags.length
+
+                    ? `
+
+                      <div class="tags">
+
+                        ${
+
+                          tags.map(
+
+                            tag =>
+
+                              `<span class="tag">
+
+                                ${tag}
+
+                              </span>`
+
+                          ).join("")
+
+                        }
+
+                      </div>
+
+                    `
+
+                    : ""
+                }
+
+
+
+                <div class="details">
+
+                  <strong>
+
+                    ${info.ingredients}:
+
+                  </strong>
+
+                  ${ingredients}
+
+                </div>
+
+
+
+                <div class="details">
+
+                  <strong>
+
+                    ${info.allergens}:
+
+                  </strong>
+
+                  ${allergens}
+
+                </div>
+
+
+
+                <div class="details">
+
+                  ${
+                    item.serving_size
+
+                      ? `${info.portion}: ${item.serving_size}`
+
+                      : ""
+                  }
+
+
+                  ${
+                    item.prep_time
+
+                      ? ` • ${info.prep}: ~${item.prep_time} ${info.minutes}`
+
+                      : ""
+                  }
+
+                </div>
+
+
+              </div>
+
+            `;
+
+
+
+            menuContainer.appendChild(
+              card
+            );
+
+          });
+
+        }
+
+      );
+
+    }
+
+
+
+    /* =========================
+       APPLY LANGUAGE
+    ========================== */
+
+
+    function applyLanguage(language) {
+
+
+      currentLanguage =
+
+        supportedLanguages.includes(
+          language
+        )
+
+          ? language
+
+          : "en";
+
+
+
+      localStorage.setItem(
+
+        "restaurant-language",
+
+        currentLanguage
+
+      );
+
+
+
+      setDirection(
+        currentLanguage
+      );
+
+
+
+      document.getElementById(
+        "languageSelect"
+      ).value = currentLanguage;
+
+
+
+      const info = t();
+
+
+
+      document.getElementById(
+        "tagline"
+      ).textContent =
+        info.tagline;
+
+
+
+      document.getElementById(
+        "aiTitle"
+      ).textContent =
+        "🤖 " + info.ai_title;
+
+
+
+      document.getElementById(
+        "aiIntro"
+      ).textContent =
+        info.ai_intro;
+
+
+
+      document.getElementById(
+        "question"
+      ).placeholder =
+        info.placeholder;
+
+
+
+      document.getElementById(
+        "askButton"
+      ).textContent =
+        info.ask;
+
+
+
+      /*
+        Text shown on collapsed
+        AI button
+      */
+
+      document.getElementById(
+        "aiToggleText"
+      ).textContent =
+        info.ai_title;
+
+
+
+      renderMenu();
+
+    }
+
+
+
+    /* =========================
+       AI OPEN / CLOSE
+    ========================== */
+
+
+    const aiBox =
+      document.getElementById(
+        "aiBox"
+      );
+
+
+    const aiToggle =
+      document.getElementById(
+        "aiToggle"
+      );
+
+
+
+    aiToggle.addEventListener(
+
+      "click",
+
+      () => {
+
+        aiBox.classList.toggle(
+          "open"
+        );
+
+      }
+
+    );
+
+
+
+    /* =========================
+       AI WAITER
+    ========================== */
+
+
+    async function askWaiter() {
+
+
+      const input =
+        document.getElementById(
+          "question"
+        );
+
+
+      const answerBox =
+        document.getElementById(
+          "answer"
+        );
+
+
+      const message =
+        input.value.trim();
+
+
+      const info = t();
+
+
+
+      if (!message) {
+
+        answerBox.innerText =
+          info.empty;
+
+        return;
+
+      }
+
+
+
+      answerBox.innerText =
+        info.thinking;
+
+
+
+      try {
+
+
+        const response =
+          await fetch(
+
+            "/api/chat",
+
+            {
+
+              method: "POST",
+
+              headers: {
+
+                "Content-Type":
+                  "application/json"
+
+              },
+
+              body: JSON.stringify({
+
+                message:
+                  message,
+
+                language:
+                  currentLanguage
+
+              })
+
+            }
+
+          );
+
+
+
+        const data =
+          await response.json();
+
+
+
+        if (!response.ok) {
+
+          throw new Error(
+
+            data.error ||
+            "Server error"
+
+          );
+
+        }
+
+
+
+        answerBox.innerText =
+          data.answer;
+
+
+
+      }
+
+      catch (error) {
+
+
+        console.error(
+          error
+        );
+
+
+        answerBox.innerText =
+          info.error;
+
+      }
+
+    }
+
+
+
+    /* =========================
+       EVENTS
+    ========================== */
+
+
+    document.getElementById(
+      "languageSelect"
+    ).addEventListener(
+
+      "change",
+
+      event => {
+
+        applyLanguage(
+          event.target.value
+        );
+
+      }
+
+    );
+
+
+
+    document.getElementById(
+      "askButton"
+    ).addEventListener(
+
+      "click",
+
+      askWaiter
+
+    );
+
+
+
+    document.getElementById(
+      "question"
+    ).addEventListener(
+
+      "keydown",
+
+      event => {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          askWaiter();
+
+        }
+
+      }
+
+    );
+
+
+
+    /* =========================
+       START
+    ========================== */
+
+
+    applyLanguage(
+      detectLanguage()
+    );
+
+
+  </script>
+
+
 </body>
+
 </html>
