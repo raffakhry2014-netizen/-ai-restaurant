@@ -4,10 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gastlyo Admin</title>
+
+  <!-- More compatible browser build of Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root{
       --green:#1f4d3b;
-      --green2:#2d6a52;
       --cream:#f7f4ee;
       --card:#ffffff;
       --text:#1d2a24;
@@ -17,13 +20,16 @@
       --ok:#18864b;
       --yellow:#e9b949;
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Arial,Helvetica,sans-serif;
       background:var(--cream);
       color:var(--text);
     }
+
     header{
       background:var(--green);
       color:white;
@@ -34,9 +40,16 @@
       gap:16px;
       flex-wrap:wrap;
     }
+
     header h1{margin:0;font-size:22px}
     header .small{opacity:.8;font-size:13px}
-    .wrap{max-width:1180px;margin:28px auto;padding:0 16px}
+
+    .wrap{
+      max-width:1180px;
+      margin:28px auto;
+      padding:0 16px;
+    }
+
     .panel{
       background:var(--card);
       border:1px solid var(--line);
@@ -44,11 +57,19 @@
       padding:22px;
       box-shadow:0 8px 28px rgba(0,0,0,.05);
     }
+
     .login{
       max-width:430px;
       margin:60px auto;
     }
-    label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}
+
+    label{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      margin:14px 0 6px;
+    }
+
     input,textarea,select{
       width:100%;
       padding:11px 12px;
@@ -57,7 +78,9 @@
       background:white;
       font-size:14px;
     }
+
     textarea{min-height:82px;resize:vertical}
+
     button{
       border:none;
       border-radius:10px;
@@ -66,14 +89,50 @@
       font-weight:700;
       font-size:14px;
     }
+
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
     .primary{background:var(--green);color:white}
     .secondary{background:#edf2ef;color:var(--green)}
     .danger{background:#f9e9e9;color:var(--danger)}
     .yellow{background:var(--yellow);color:#2e2a1d}
     .full{width:100%;margin-top:16px}
+
     .hidden{display:none!important}
-    .error{color:var(--danger);font-size:13px;margin-top:12px}
-    .success{color:var(--ok);font-size:13px;margin-top:12px}
+
+    .message{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:13px;
+      line-height:1.45;
+      display:none;
+    }
+
+    .message.error{
+      display:block;
+      color:var(--danger);
+      background:#fbecec;
+      border:1px solid #f2caca;
+    }
+
+    .message.success{
+      display:block;
+      color:var(--ok);
+      background:#eaf7ef;
+      border:1px solid #c7ead4;
+    }
+
+    .message.info{
+      display:block;
+      color:#35534a;
+      background:#eef5f2;
+      border:1px solid #d7e6df;
+    }
+
     .toolbar{
       display:flex;
       gap:10px;
@@ -82,19 +141,32 @@
       flex-wrap:wrap;
       margin-bottom:18px;
     }
-    .toolbar .left{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .count{font-size:13px;color:var(--muted)}
+
+    .toolbar .left{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .count{
+      font-size:13px;
+      color:var(--muted);
+    }
+
     .grid{
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
       gap:14px;
     }
+
     .item{
       border:1px solid var(--line);
       border-radius:16px;
       background:#fff;
       padding:15px;
     }
+
     .item-top{
       display:flex;
       justify-content:space-between;
@@ -102,8 +174,10 @@
       align-items:flex-start;
       margin-bottom:10px;
     }
+
     .item-name{font-weight:800}
     .price{font-weight:800;color:var(--green)}
+
     .badge{
       display:inline-block;
       font-size:11px;
@@ -113,10 +187,18 @@
       background:#eef3f0;
       color:#4e5d55;
     }
+
     .available{background:#e5f5eb;color:#14743f}
     .soldout{background:#f7e7e7;color:#9f2f2f}
-    .actions{display:flex;gap:8px;margin-top:12px}
+
+    .actions{
+      display:flex;
+      gap:8px;
+      margin-top:12px;
+    }
+
     .actions button{flex:1}
+
     .modal{
       position:fixed;
       inset:0;
@@ -127,6 +209,7 @@
       padding:18px;
       z-index:50;
     }
+
     .modal-card{
       width:min(760px,100%);
       max-height:92vh;
@@ -135,108 +218,239 @@
       border-radius:18px;
       padding:20px;
     }
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .checks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-    .check{
-      display:flex;gap:7px;align-items:center;
-      border:1px solid var(--line);
-      padding:9px;border-radius:10px;
-      font-size:13px
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
     }
+
+    .checks{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .check{
+      display:flex;
+      gap:7px;
+      align-items:center;
+      border:1px solid var(--line);
+      padding:9px;
+      border-radius:10px;
+      font-size:13px;
+    }
+
     .check input{width:auto}
-    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      margin-top:18px;
+    }
+
     @media(max-width:650px){
       .row{grid-template-columns:1fr}
       .checks{grid-template-columns:1fr}
     }
   </style>
 </head>
+
 <body>
+
 <header>
   <div>
     <h1>Gastlyo Admin</h1>
     <div class="small">Kiwan Fakhri Restaurant</div>
   </div>
-  <button id="logoutBtn" class="secondary hidden">Abmelden</button>
+
+  <button id="logoutBtn" class="secondary hidden">
+    Abmelden
+  </button>
 </header>
 
+
 <div class="wrap">
+
   <section id="loginView" class="panel login">
+
     <h2>Admin Login</h2>
-    <p style="color:#6f7b75">Melde dich mit deinem Restaurant-Admin-Konto an.</p>
+
+    <p style="color:#6f7b75">
+      Melde dich mit deinem Restaurant-Admin-Konto an.
+    </p>
+
     <label>E-Mail</label>
-    <input id="email" type="email" autocomplete="email" />
+    <input
+      id="email"
+      type="email"
+      autocomplete="email"
+    />
+
     <label>Passwort</label>
-    <input id="password" type="password" autocomplete="current-password" />
-    <button id="loginBtn" class="primary full">Anmelden</button>
-    <div id="loginMsg"></div>
+    <input
+      id="password"
+      type="password"
+      autocomplete="current-password"
+    />
+
+    <button
+      id="loginBtn"
+      class="primary full"
+    >
+      Anmelden
+    </button>
+
+    <div
+      id="loginMsg"
+      class="message"
+    ></div>
+
   </section>
 
-  <section id="adminView" class="hidden">
+
+  <section
+    id="adminView"
+    class="hidden"
+  >
+
     <div class="panel">
+
       <div class="toolbar">
+
         <div class="left">
-          <button id="refreshBtn" class="secondary">Aktualisieren</button>
-          <span id="itemCount" class="count"></span>
+
+          <button
+            id="refreshBtn"
+            class="secondary"
+          >
+            Aktualisieren
+          </button>
+
+          <span
+            id="itemCount"
+            class="count"
+          ></span>
+
         </div>
-        <div class="count">Preis ändern • Verfügbarkeit • Menüdetails</div>
+
+        <div class="count">
+          Preis ändern • Verfügbarkeit • Menüdetails
+        </div>
+
       </div>
-      <div id="items" class="grid"></div>
-      <div id="adminMsg"></div>
+
+      <div
+        id="items"
+        class="grid"
+      ></div>
+
+      <div
+        id="adminMsg"
+        class="message"
+      ></div>
+
     </div>
+
   </section>
+
 </div>
 
-<div id="editModal" class="modal hidden">
+
+<div
+  id="editModal"
+  class="modal hidden"
+>
+
   <div class="modal-card">
+
     <h2>Menüeintrag bearbeiten</h2>
-    <input id="editId" type="hidden" />
+
+    <input
+      id="editId"
+      type="hidden"
+    />
 
     <div class="row">
+
       <div>
         <label>Name</label>
         <input id="editName" />
       </div>
+
       <div>
         <label>Preis (€)</label>
-        <input id="editPrice" type="number" min="0" step="0.01" />
+        <input
+          id="editPrice"
+          type="number"
+          min="0"
+          step="0.01"
+        />
       </div>
+
     </div>
 
     <label>Beschreibung</label>
     <textarea id="editDescription"></textarea>
 
     <div class="row">
+
       <div>
         <label>Kategorie</label>
         <input id="editCategory" />
       </div>
+
       <div>
         <label>Portion</label>
         <input id="editServing" />
       </div>
+
     </div>
 
     <div class="row">
+
       <div>
         <label>Kalorien</label>
-        <input id="editCalories" type="number" min="0" />
+        <input
+          id="editCalories"
+          type="number"
+          min="0"
+        />
       </div>
+
       <div>
         <label>Protein (g)</label>
-        <input id="editProtein" type="number" min="0" />
+        <input
+          id="editProtein"
+          type="number"
+          min="0"
+        />
       </div>
+
     </div>
 
     <div class="row">
+
       <div>
         <label>Fett (g)</label>
-        <input id="editFat" type="number" min="0" />
+        <input
+          id="editFat"
+          type="number"
+          min="0"
+        />
       </div>
+
       <div>
         <label>Kohlenhydrate (g)</label>
-        <input id="editCarbs" type="number" min="0" />
+        <input
+          id="editCarbs"
+          type="number"
+          min="0"
+        />
       </div>
+
     </div>
 
     <label>Zutaten (durch Komma trennen)</label>
@@ -246,267 +460,1145 @@
     <textarea id="editAllergens"></textarea>
 
     <div class="checks">
-      <label class="check"><input id="editVegetarian" type="checkbox" /> Vegetarisch</label>
-      <label class="check"><input id="editVegan" type="checkbox" /> Vegan</label>
-      <label class="check"><input id="editGlutenFree" type="checkbox" /> Glutenfrei</label>
-      <label class="check"><input id="editBestseller" type="checkbox" /> Bestseller</label>
-      <label class="check"><input id="editAvailable" type="checkbox" /> Verfügbar</label>
+
+      <label class="check">
+        <input
+          id="editVegetarian"
+          type="checkbox"
+        />
+        Vegetarisch
+      </label>
+
+      <label class="check">
+        <input
+          id="editVegan"
+          type="checkbox"
+        />
+        Vegan
+      </label>
+
+      <label class="check">
+        <input
+          id="editGlutenFree"
+          type="checkbox"
+        />
+        Glutenfrei
+      </label>
+
+      <label class="check">
+        <input
+          id="editBestseller"
+          type="checkbox"
+        />
+        Bestseller
+      </label>
+
+      <label class="check">
+        <input
+          id="editAvailable"
+          type="checkbox"
+        />
+        Verfügbar
+      </label>
+
     </div>
 
     <div class="modal-actions">
-      <button id="cancelEdit" class="secondary">Abbrechen</button>
-      <button id="saveEdit" class="primary">Speichern</button>
+
+      <button
+        id="cancelEdit"
+        class="secondary"
+      >
+        Abbrechen
+      </button>
+
+      <button
+        id="saveEdit"
+        class="primary"
+      >
+        Speichern
+      </button>
+
     </div>
-    <div id="editMsg"></div>
+
+    <div
+      id="editMsg"
+      class="message"
+    ></div>
+
   </div>
+
 </div>
 
-<script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-  const RESTAURANT_SLUG = "kiwan-fakhri";
-  let supabase;
-  let restaurantId = null;
-  let currentItems = [];
+<script>
 
-  const $ = id => document.getElementById(id);
+const RESTAURANT_SLUG = "kiwan-fakhri";
 
-  function showMsg(el, text, ok=false){
-    el.className = ok ? "success" : "error";
-    el.textContent = text || "";
-  }
+let supabaseClient = null;
+let restaurantId = null;
+let currentItems = [];
 
-  function esc(s=""){
-    return String(s)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;");
-  }
 
-  async function init(){
-    const cfgResp = await fetch("/api/config");
-    const cfg = await cfgResp.json();
+const $ = id =>
+  document.getElementById(id);
 
-    if(!cfgResp.ok){
-      showMsg($("loginMsg"), cfg.error || "Konfiguration konnte nicht geladen werden.");
-      return;
+
+function showMessage(
+  element,
+  text,
+  type = "error"
+){
+
+  element.textContent = text || "";
+
+  element.className =
+    "message " + type;
+
+}
+
+
+function clearMessage(element){
+
+  element.textContent = "";
+
+  element.className =
+    "message";
+
+}
+
+
+function esc(value = ""){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+
+}
+
+
+async function init(){
+
+  try{
+
+    showMessage(
+      $("loginMsg"),
+      "Verbindung wird hergestellt...",
+      "info"
+    );
+
+
+    if(
+      !window.supabase ||
+      !window.supabase.createClient
+    ){
+
+      throw new Error(
+        "Supabase-Bibliothek konnte nicht geladen werden."
+      );
+
     }
 
-    supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
 
-    const { data:{ session } } = await supabase.auth.getSession();
-    if(session) await enterAdmin();
+    const cfgResp =
+      await fetch(
+        "/api/config",
+        {
+          cache:"no-store"
+        }
+      );
+
+
+    let cfg;
+
+    try{
+
+      cfg =
+        await cfgResp.json();
+
+    }catch(error){
+
+      throw new Error(
+        "Die Server-Konfiguration konnte nicht gelesen werden."
+      );
+
+    }
+
+
+    if(!cfgResp.ok){
+
+      throw new Error(
+        cfg.error ||
+        "Die Server-Konfiguration ist nicht verfügbar."
+      );
+
+    }
+
+
+    if(
+      !cfg.supabaseUrl ||
+      !cfg.supabaseAnonKey
+    ){
+
+      throw new Error(
+        "SUPABASE_URL oder SUPABASE_ANON_KEY fehlt in Vercel."
+      );
+
+    }
+
+
+    supabaseClient =
+      window.supabase.createClient(
+        cfg.supabaseUrl,
+        cfg.supabaseAnonKey
+      );
+
+
+    clearMessage(
+      $("loginMsg")
+    );
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    if(data?.session){
+
+      showMessage(
+        $("loginMsg"),
+        "Sitzung gefunden. Adminbereich wird geladen...",
+        "info"
+      );
+
+      await enterAdmin();
+
+    }
+
+
+  }catch(error){
+
+    console.error(
+      "Gastlyo init error:",
+      error
+    );
+
+    showMessage(
+      $("loginMsg"),
+      "Verbindungsfehler: " +
+      (
+        error?.message ||
+        "Unbekannter Fehler"
+      ),
+      "error"
+    );
+
   }
 
-  async function login(){
-    showMsg($("loginMsg"), "");
-    $("loginBtn").disabled = true;
+}
 
-    const email = $("email").value.trim();
-    const password = $("password").value;
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+async function login(){
+
+  if(!supabaseClient){
+
+    showMessage(
+      $("loginMsg"),
+      "Supabase ist noch nicht verbunden. Bitte Seite neu laden.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const email =
+    $("email")
+      .value
+      .trim();
+
+
+  const password =
+    $("password")
+      .value;
+
+
+  if(
+    !email ||
+    !password
+  ){
+
+    showMessage(
+      $("loginMsg"),
+      "Bitte E-Mail und Passwort eingeben.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  $("loginBtn").disabled = true;
+
+  $("loginBtn").textContent =
+    "Anmeldung läuft...";
+
+
+  showMessage(
+    $("loginMsg"),
+    "Anmeldung läuft...",
+    "info"
+  );
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .auth
+        .signInWithPassword({
+          email,
+          password
+        });
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    if(
+      !data ||
+      !data.user
+    ){
+
+      throw new Error(
+        "Supabase hat keinen Benutzer zurückgegeben."
+      );
+
+    }
+
+
+    showMessage(
+      $("loginMsg"),
+      "Login erfolgreich. Admin-Zugriff wird geprüft...",
+      "success"
+    );
+
+
+    await enterAdmin();
+
+
+  }catch(error){
+
+    console.error(
+      "Gastlyo login error:",
+      error
+    );
+
+
+    let message =
+      error?.message ||
+      "Login fehlgeschlagen.";
+
+
+    if(
+      message
+        .toLowerCase()
+        .includes("invalid login credentials")
+    ){
+
+      message =
+        "E-Mail oder Passwort ist falsch.";
+
+    }
+
+
+    showMessage(
+      $("loginMsg"),
+      "Login fehlgeschlagen: " +
+      message,
+      "error"
+    );
+
+
+  }finally{
 
     $("loginBtn").disabled = false;
 
-    if(error){
-      showMsg($("loginMsg"), "Login fehlgeschlagen: " + error.message);
-      return;
-    }
+    $("loginBtn").textContent =
+      "Anmelden";
 
-    await enterAdmin();
   }
 
-  async function enterAdmin(){
-    const { data:{ user } } = await supabase.auth.getUser();
-    if(!user) return;
+}
 
-    const { data: restaurant, error: rError } = await supabase
-      .from("restaurants")
-      .select("id,name")
-      .eq("slug", RESTAURANT_SLUG)
-      .single();
 
-    if(rError || !restaurant){
-      showMsg($("loginMsg"), "Restaurant konnte nicht geladen werden.");
-      return;
+async function enterAdmin(){
+
+  try{
+
+    const {
+      data:userData,
+      error:userError
+    } =
+      await supabaseClient
+        .auth
+        .getUser();
+
+
+    if(userError){
+
+      throw userError;
+
     }
 
-    const { data: membership, error: mError } = await supabase
-      .from("restaurant_users")
-      .select("role")
-      .eq("restaurant_id", restaurant.id)
-      .eq("user_id", user.id)
-      .maybeSingle();
 
-    if(mError || !membership){
-      await supabase.auth.signOut();
-      showMsg($("loginMsg"), "Dieses Konto hat keinen Admin-Zugriff.");
-      return;
+    const user =
+      userData?.user;
+
+
+    if(!user){
+
+      throw new Error(
+        "Kein angemeldeter Benutzer gefunden."
+      );
+
     }
 
-    restaurantId = restaurant.id;
-    $("loginView").classList.add("hidden");
-    $("adminView").classList.remove("hidden");
-    $("logoutBtn").classList.remove("hidden");
+
+    const {
+      data:restaurant,
+      error:rError
+    } =
+      await supabaseClient
+        .from("restaurants")
+        .select("id,name")
+        .eq(
+          "slug",
+          RESTAURANT_SLUG
+        )
+        .single();
+
+
+    if(rError){
+
+      throw new Error(
+        "Restaurant konnte nicht geladen werden: " +
+        rError.message
+      );
+
+    }
+
+
+    if(!restaurant){
+
+      throw new Error(
+        "Restaurant wurde nicht gefunden."
+      );
+
+    }
+
+
+    const {
+      data:membership,
+      error:mError
+    } =
+      await supabaseClient
+        .from("restaurant_users")
+        .select(
+          "restaurant_id,user_id,role"
+        )
+        .eq(
+          "restaurant_id",
+          restaurant.id
+        )
+        .eq(
+          "user_id",
+          user.id
+        )
+        .maybeSingle();
+
+
+    if(mError){
+
+      throw new Error(
+        "Admin-Berechtigung konnte nicht geprüft werden: " +
+        mError.message
+      );
+
+    }
+
+
+    if(!membership){
+
+      await supabaseClient
+        .auth
+        .signOut();
+
+
+      throw new Error(
+        "Dieses Konto ist nicht als Restaurant-Admin freigeschaltet."
+      );
+
+    }
+
+
+    restaurantId =
+      restaurant.id;
+
+
+    $("loginView")
+      .classList
+      .add("hidden");
+
+
+    $("adminView")
+      .classList
+      .remove("hidden");
+
+
+    $("logoutBtn")
+      .classList
+      .remove("hidden");
+
+
     await loadItems();
+
+
+  }catch(error){
+
+    console.error(
+      "Gastlyo admin access error:",
+      error
+    );
+
+
+    showMessage(
+      $("loginMsg"),
+      error?.message ||
+      "Admin-Zugriff fehlgeschlagen.",
+      "error"
+    );
+
   }
 
-  async function loadItems(){
-    const { data, error } = await supabase
+}
+
+
+async function loadItems(){
+
+  clearMessage(
+    $("adminMsg")
+  );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
       .from("menu_items")
       .select("*")
-      .eq("restaurant_id", restaurantId)
-      .order("sort_order", { ascending:true })
-      .order("external_id", { ascending:true });
+      .eq(
+        "restaurant_id",
+        restaurantId
+      )
+      .order(
+        "sort_order",
+        {
+          ascending:true
+        }
+      )
+      .order(
+        "external_id",
+        {
+          ascending:true
+        }
+      );
 
-    if(error){
-      showMsg($("adminMsg"), "Menü konnte nicht geladen werden: " + error.message);
-      return;
-    }
 
-    currentItems = data || [];
-    $("itemCount").textContent = `${currentItems.length} Menüeinträge`;
-    renderItems();
+  if(error){
+
+    showMessage(
+      $("adminMsg"),
+      "Menü konnte nicht geladen werden: " +
+      error.message,
+      "error"
+    );
+
+    return;
+
   }
 
-  function renderItems(){
-    $("items").innerHTML = currentItems.map(item => `
-      <article class="item">
-        <div class="item-top">
-          <div>
-            <div class="item-name">${esc(item.name)}</div>
-            <span class="badge">${esc(item.category)}</span>
-            <span class="badge ${item.available ? "available" : "soldout"}">
-              ${item.available ? "Verfügbar" : "Ausverkauft"}
-            </span>
+
+  currentItems =
+    data || [];
+
+
+  $("itemCount").textContent =
+    `${currentItems.length} Menüeinträge`;
+
+
+  renderItems();
+
+}
+
+
+function renderItems(){
+
+  $("items").innerHTML =
+    currentItems
+      .map(
+        item => `
+
+        <article class="item">
+
+          <div class="item-top">
+
+            <div>
+
+              <div class="item-name">
+                ${esc(item.name)}
+              </div>
+
+              <span class="badge">
+                ${esc(item.category)}
+              </span>
+
+              <span
+                class="
+                  badge
+                  ${
+                    item.available
+                    ? "available"
+                    : "soldout"
+                  }
+                "
+              >
+                ${
+                  item.available
+                  ? "Verfügbar"
+                  : "Ausverkauft"
+                }
+              </span>
+
+            </div>
+
+            <div class="price">
+              €${Number(item.price).toFixed(2)}
+            </div>
+
           </div>
-          <div class="price">€${Number(item.price).toFixed(2)}</div>
-        </div>
-        <div style="font-size:13px;color:#6f7b75;line-height:1.5">${esc(item.description || "")}</div>
-        <div class="actions">
-          <button class="secondary" data-edit="${item.id}">Bearbeiten</button>
-          <button class="${item.available ? "danger" : "yellow"}" data-toggle="${item.id}">
-            ${item.available ? "Ausverkauft" : "Verfügbar"}
-          </button>
-        </div>
-      </article>
-    `).join("");
 
-    document.querySelectorAll("[data-edit]").forEach(btn=>{
-      btn.addEventListener("click",()=>openEdit(Number(btn.dataset.edit)));
-    });
+          <div
+            style="
+              font-size:13px;
+              color:#6f7b75;
+              line-height:1.5
+            "
+          >
+            ${esc(item.description || "")}
+          </div>
 
-    document.querySelectorAll("[data-toggle]").forEach(btn=>{
-      btn.addEventListener("click",()=>toggleAvailability(Number(btn.dataset.toggle)));
-    });
+          <div class="actions">
+
+            <button
+              class="secondary"
+              data-edit="${item.id}"
+            >
+              Bearbeiten
+            </button>
+
+            <button
+              class="${
+                item.available
+                ? "danger"
+                : "yellow"
+              }"
+              data-toggle="${item.id}"
+            >
+              ${
+                item.available
+                ? "Ausverkauft"
+                : "Verfügbar"
+              }
+            </button>
+
+          </div>
+
+        </article>
+
+      `
+      )
+      .join("");
+
+
+  document
+    .querySelectorAll("[data-edit]")
+    .forEach(
+      button => {
+
+        button
+          .addEventListener(
+            "click",
+            () =>
+              openEdit(
+                Number(
+                  button.dataset.edit
+                )
+              )
+          );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll("[data-toggle]")
+    .forEach(
+      button => {
+
+        button
+          .addEventListener(
+            "click",
+            () =>
+              toggleAvailability(
+                Number(
+                  button.dataset.toggle
+                )
+              )
+          );
+
+      }
+    );
+
+}
+
+
+async function toggleAvailability(id){
+
+  const item =
+    currentItems
+      .find(
+        item =>
+          item.id === id
+      );
+
+
+  if(!item){
+    return;
   }
 
-  async function toggleAvailability(id){
-    const item = currentItems.find(x=>x.id===id);
-    if(!item) return;
 
-    const { error } = await supabase
+  const {
+    error
+  } =
+    await supabaseClient
       .from("menu_items")
-      .update({ available: !item.available })
-      .eq("id", id)
-      .eq("restaurant_id", restaurantId);
+      .update({
+        available:
+          !item.available
+      })
+      .eq(
+        "id",
+        id
+      )
+      .eq(
+        "restaurant_id",
+        restaurantId
+      );
 
-    if(error){
-      showMsg($("adminMsg"), "Änderung fehlgeschlagen: " + error.message);
-      return;
-    }
 
-    await loadItems();
+  if(error){
+
+    showMessage(
+      $("adminMsg"),
+      "Änderung fehlgeschlagen: " +
+      error.message,
+      "error"
+    );
+
+    return;
+
   }
 
-  function openEdit(id){
-    const item = currentItems.find(x=>x.id===id);
-    if(!item) return;
 
-    $("editId").value = item.id;
-    $("editName").value = item.name || "";
-    $("editPrice").value = item.price ?? "";
-    $("editDescription").value = item.description || "";
-    $("editCategory").value = item.category || "";
-    $("editServing").value = item.serving_size || "";
-    $("editCalories").value = item.calories ?? "";
-    $("editProtein").value = item.protein ?? "";
-    $("editFat").value = item.fat ?? "";
-    $("editCarbs").value = item.carbs ?? "";
-    $("editIngredients").value = Array.isArray(item.ingredients) ? item.ingredients.join(", ") : "";
-    $("editAllergens").value = Array.isArray(item.allergens) ? item.allergens.join(", ") : "";
-    $("editVegetarian").checked = !!item.vegetarian;
-    $("editVegan").checked = !!item.vegan;
-    $("editGlutenFree").checked = !!item.gluten_free;
-    $("editBestseller").checked = !!item.bestseller;
-    $("editAvailable").checked = !!item.available;
-    showMsg($("editMsg"), "");
-    $("editModal").classList.remove("hidden");
+  await loadItems();
+
+}
+
+
+function openEdit(id){
+
+  const item =
+    currentItems
+      .find(
+        item =>
+          item.id === id
+      );
+
+
+  if(!item){
+    return;
   }
 
-  function csvToArray(v){
-    return v.split(",").map(x=>x.trim()).filter(Boolean);
+
+  $("editId").value =
+    item.id;
+
+
+  $("editName").value =
+    item.name || "";
+
+
+  $("editPrice").value =
+    item.price ?? "";
+
+
+  $("editDescription").value =
+    item.description || "";
+
+
+  $("editCategory").value =
+    item.category || "";
+
+
+  $("editServing").value =
+    item.serving_size || "";
+
+
+  $("editCalories").value =
+    item.calories ?? "";
+
+
+  $("editProtein").value =
+    item.protein ?? "";
+
+
+  $("editFat").value =
+    item.fat ?? "";
+
+
+  $("editCarbs").value =
+    item.carbs ?? "";
+
+
+  $("editIngredients").value =
+    Array.isArray(
+      item.ingredients
+    )
+      ? item.ingredients.join(", ")
+      : "";
+
+
+  $("editAllergens").value =
+    Array.isArray(
+      item.allergens
+    )
+      ? item.allergens.join(", ")
+      : "";
+
+
+  $("editVegetarian").checked =
+    !!item.vegetarian;
+
+
+  $("editVegan").checked =
+    !!item.vegan;
+
+
+  $("editGlutenFree").checked =
+    !!item.gluten_free;
+
+
+  $("editBestseller").checked =
+    !!item.bestseller;
+
+
+  $("editAvailable").checked =
+    !!item.available;
+
+
+  clearMessage(
+    $("editMsg")
+  );
+
+
+  $("editModal")
+    .classList
+    .remove("hidden");
+
+}
+
+
+function csvToArray(value){
+
+  return value
+    .split(",")
+    .map(
+      item =>
+        item.trim()
+    )
+    .filter(Boolean);
+
+}
+
+
+async function saveEdit(){
+
+  const id =
+    Number(
+      $("editId").value
+    );
+
+
+  const payload = {
+
+    name:
+      $("editName")
+        .value
+        .trim(),
+
+    price:
+      Number(
+        $("editPrice")
+          .value
+      ),
+
+    description:
+      $("editDescription")
+        .value
+        .trim(),
+
+    category:
+      $("editCategory")
+        .value
+        .trim(),
+
+    serving_size:
+      $("editServing")
+        .value
+        .trim()
+        || null,
+
+    calories:
+      $("editCalories").value === ""
+        ? null
+        : Number(
+            $("editCalories").value
+          ),
+
+    protein:
+      $("editProtein").value === ""
+        ? null
+        : Number(
+            $("editProtein").value
+          ),
+
+    fat:
+      $("editFat").value === ""
+        ? null
+        : Number(
+            $("editFat").value
+          ),
+
+    carbs:
+      $("editCarbs").value === ""
+        ? null
+        : Number(
+            $("editCarbs").value
+          ),
+
+    ingredients:
+      csvToArray(
+        $("editIngredients").value
+      ),
+
+    allergens:
+      csvToArray(
+        $("editAllergens").value
+      ),
+
+    vegetarian:
+      $("editVegetarian").checked,
+
+    vegan:
+      $("editVegan").checked,
+
+    gluten_free:
+      $("editGlutenFree").checked,
+
+    bestseller:
+      $("editBestseller").checked,
+
+    available:
+      $("editAvailable").checked
+
+  };
+
+
+  if(
+    !payload.name ||
+    Number.isNaN(
+      payload.price
+    )
+  ){
+
+    showMessage(
+      $("editMsg"),
+      "Name und Preis sind erforderlich.",
+      "error"
+    );
+
+    return;
+
   }
 
-  async function saveEdit(){
-    const id = Number($("editId").value);
 
-    const payload = {
-      name: $("editName").value.trim(),
-      price: Number($("editPrice").value),
-      description: $("editDescription").value.trim(),
-      category: $("editCategory").value.trim(),
-      serving_size: $("editServing").value.trim() || null,
-      calories: $("editCalories").value === "" ? null : Number($("editCalories").value),
-      protein: $("editProtein").value === "" ? null : Number($("editProtein").value),
-      fat: $("editFat").value === "" ? null : Number($("editFat").value),
-      carbs: $("editCarbs").value === "" ? null : Number($("editCarbs").value),
-      ingredients: csvToArray($("editIngredients").value),
-      allergens: csvToArray($("editAllergens").value),
-      vegetarian: $("editVegetarian").checked,
-      vegan: $("editVegan").checked,
-      gluten_free: $("editGlutenFree").checked,
-      bestseller: $("editBestseller").checked,
-      available: $("editAvailable").checked
-    };
+  $("saveEdit").disabled = true;
 
-    if(!payload.name || Number.isNaN(payload.price)){
-      showMsg($("editMsg"), "Name und Preis sind erforderlich.");
-      return;
-    }
 
-    $("saveEdit").disabled = true;
-    const { error } = await supabase
+  const {
+    error
+  } =
+    await supabaseClient
       .from("menu_items")
       .update(payload)
-      .eq("id", id)
-      .eq("restaurant_id", restaurantId);
-    $("saveEdit").disabled = false;
+      .eq(
+        "id",
+        id
+      )
+      .eq(
+        "restaurant_id",
+        restaurantId
+      );
 
-    if(error){
-      showMsg($("editMsg"), "Speichern fehlgeschlagen: " + error.message);
-      return;
+
+  $("saveEdit").disabled = false;
+
+
+  if(error){
+
+    showMessage(
+      $("editMsg"),
+      "Speichern fehlgeschlagen: " +
+      error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  $("editModal")
+    .classList
+    .add("hidden");
+
+
+  await loadItems();
+
+}
+
+
+async function logout(){
+
+  if(
+    supabaseClient
+  ){
+
+    await supabaseClient
+      .auth
+      .signOut();
+
+  }
+
+
+  location.reload();
+
+}
+
+
+$("loginBtn")
+  .addEventListener(
+    "click",
+    login
+  );
+
+
+$("password")
+  .addEventListener(
+    "keydown",
+    event => {
+
+      if(
+        event.key === "Enter"
+      ){
+
+        login();
+
+      }
+
     }
+  );
 
-    $("editModal").classList.add("hidden");
-    await loadItems();
-  }
 
-  async function logout(){
-    await supabase.auth.signOut();
-    location.reload();
-  }
+$("logoutBtn")
+  .addEventListener(
+    "click",
+    logout
+  );
 
-  $("loginBtn").addEventListener("click", login);
-  $("password").addEventListener("keydown", e=>{ if(e.key==="Enter") login(); });
-  $("logoutBtn").addEventListener("click", logout);
-  $("refreshBtn").addEventListener("click", loadItems);
-  $("cancelEdit").addEventListener("click", ()=>$("editModal").classList.add("hidden"));
-  $("saveEdit").addEventListener("click", saveEdit);
 
-  init();
+$("refreshBtn")
+  .addEventListener(
+    "click",
+    loadItems
+  );
+
+
+$("cancelEdit")
+  .addEventListener(
+    "click",
+    () =>
+      $("editModal")
+        .classList
+        .add("hidden")
+  );
+
+
+$("saveEdit")
+  .addEventListener(
+    "click",
+    saveEdit
+  );
+
+
+init();
+
 </script>
+
 </body>
 </html>
