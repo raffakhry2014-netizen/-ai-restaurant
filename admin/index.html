@@ -4,11 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gastlyo Admin</title>
-
-  <!-- More compatible browser build of Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
+<style>
     :root{
       --green:#1f4d3b;
       --cream:#f7f4ee;
@@ -532,1072 +528,223 @@
 
 
 <script>
+const RESTAURANT_SLUG="kiwan-fakhri";
+let cfg=null, accessToken=null, userId=null, restaurantId=null, currentItems=[];
+const $=id=>document.getElementById(id);
 
-const RESTAURANT_SLUG = "kiwan-fakhri";
+function showMessage(el,text,type="error"){el.textContent=text||"";el.className="message "+type}
+function clearMessage(el){el.textContent="";el.className="message"}
+function esc(v=""){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
 
-let supabaseClient = null;
-let restaurantId = null;
-let currentItems = [];
-
-
-const $ = id =>
-  document.getElementById(id);
-
-
-function showMessage(
-  element,
-  text,
-  type = "error"
-){
-
-  element.textContent = text || "";
-
-  element.className =
-    "message " + type;
-
+async function jsonFetch(url,options={}){
+  const r=await fetch(url,options);
+  let d=null;
+  try{d=await r.json()}catch{}
+  if(!r.ok){
+    throw new Error(d?.msg||d?.message||d?.error_description||d?.error||`HTTP ${r.status}`);
+  }
+  return d;
 }
 
-
-function clearMessage(element){
-
-  element.textContent = "";
-
-  element.className =
-    "message";
-
+function headers(auth=true){
+  const h={"apikey":cfg.supabaseAnonKey,"Content-Type":"application/json"};
+  if(auth&&accessToken) h.Authorization=`Bearer ${accessToken}`;
+  return h;
 }
-
-
-function esc(value = ""){
-
-  return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;");
-
-}
-
 
 async function init(){
-
   try{
+    showMessage($("loginMsg"),"Verbindung wird hergestellt...","info");
+    cfg=await jsonFetch("/api/config",{cache:"no-store"});
+    if(!cfg.supabaseUrl||!cfg.supabaseAnonKey) throw new Error("SUPABASE_URL oder SUPABASE_ANON_KEY fehlt.");
 
-    showMessage(
-      $("loginMsg"),
-      "Verbindung wird hergestellt...",
-      "info"
-    );
+    const savedToken=sessionStorage.getItem("gastlyo_access_token");
+    const savedUser=sessionStorage.getItem("gastlyo_user_id");
 
-
-    if(
-      !window.supabase ||
-      !window.supabase.createClient
-    ){
-
-      throw new Error(
-        "Supabase-Bibliothek konnte nicht geladen werden."
-      );
-
+    if(savedToken&&savedUser){
+      accessToken=savedToken;
+      userId=savedUser;
+      try{await enterAdmin();return}catch(e){
+        sessionStorage.removeItem("gastlyo_access_token");
+        sessionStorage.removeItem("gastlyo_user_id");
+        accessToken=null; userId=null;
+      }
     }
 
-
-    const cfgResp =
-      await fetch(
-        "/api/config",
-        {
-          cache:"no-store"
-        }
-      );
-
-
-    let cfg;
-
-    try{
-
-      cfg =
-        await cfgResp.json();
-
-    }catch(error){
-
-      throw new Error(
-        "Die Server-Konfiguration konnte nicht gelesen werden."
-      );
-
-    }
-
-
-    if(!cfgResp.ok){
-
-      throw new Error(
-        cfg.error ||
-        "Die Server-Konfiguration ist nicht verfügbar."
-      );
-
-    }
-
-
-    if(
-      !cfg.supabaseUrl ||
-      !cfg.supabaseAnonKey
-    ){
-
-      throw new Error(
-        "SUPABASE_URL oder SUPABASE_ANON_KEY fehlt in Vercel."
-      );
-
-    }
-
-
-    supabaseClient =
-      window.supabase.createClient(
-        cfg.supabaseUrl,
-        cfg.supabaseAnonKey
-      );
-
-
-    clearMessage(
-      $("loginMsg")
-    );
-
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .auth
-        .getSession();
-
-
-    if(error){
-
-      throw error;
-
-    }
-
-
-    if(data?.session){
-
-      showMessage(
-        $("loginMsg"),
-        "Sitzung gefunden. Adminbereich wird geladen...",
-        "info"
-      );
-
-      await enterAdmin();
-
-    }
-
-
-  }catch(error){
-
-    console.error(
-      "Gastlyo init error:",
-      error
-    );
-
-    showMessage(
-      $("loginMsg"),
-      "Verbindungsfehler: " +
-      (
-        error?.message ||
-        "Unbekannter Fehler"
-      ),
-      "error"
-    );
-
+    $("loginBtn").disabled=false;
+    showMessage($("loginMsg"),"Verbindung bereit. Bitte anmelden.","success");
+  }catch(e){
+    console.error(e);
+    $("loginBtn").disabled=true;
+    showMessage($("loginMsg"),"Verbindungsfehler: "+(e.message||"Unbekannter Fehler"),"error");
   }
-
 }
-
 
 async function login(){
+  if(!cfg){showMessage($("loginMsg"),"Verbindung ist noch nicht bereit.","error");return}
+  const email=$("email").value.trim(), password=$("password").value;
+  if(!email||!password){showMessage($("loginMsg"),"Bitte E-Mail und Passwort eingeben.","error");return}
 
-  if(!supabaseClient){
-
-    showMessage(
-      $("loginMsg"),
-      "Supabase ist noch nicht verbunden. Bitte Seite neu laden.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  const email =
-    $("email")
-      .value
-      .trim();
-
-
-  const password =
-    $("password")
-      .value;
-
-
-  if(
-    !email ||
-    !password
-  ){
-
-    showMessage(
-      $("loginMsg"),
-      "Bitte E-Mail und Passwort eingeben.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  $("loginBtn").disabled = true;
-
-  $("loginBtn").textContent =
-    "Anmeldung läuft...";
-
-
-  showMessage(
-    $("loginMsg"),
-    "Anmeldung läuft...",
-    "info"
-  );
-
+  $("loginBtn").disabled=true;
+  $("loginBtn").textContent="Anmeldung läuft...";
+  showMessage($("loginMsg"),"Anmeldung läuft...","info");
 
   try{
+    const auth=await jsonFetch(`${cfg.supabaseUrl}/auth/v1/token?grant_type=password`,{
+      method:"POST",
+      headers:{"apikey":cfg.supabaseAnonKey,"Content-Type":"application/json"},
+      body:JSON.stringify({email,password})
+    });
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .auth
-        .signInWithPassword({
-          email,
-          password
-        });
+    accessToken=auth.access_token;
+    userId=auth.user?.id;
+    if(!accessToken||!userId) throw new Error("Login-Daten wurden nicht vollständig zurückgegeben.");
 
+    sessionStorage.setItem("gastlyo_access_token",accessToken);
+    sessionStorage.setItem("gastlyo_user_id",userId);
 
-    if(error){
-
-      throw error;
-
-    }
-
-
-    if(
-      !data ||
-      !data.user
-    ){
-
-      throw new Error(
-        "Supabase hat keinen Benutzer zurückgegeben."
-      );
-
-    }
-
-
-    showMessage(
-      $("loginMsg"),
-      "Login erfolgreich. Admin-Zugriff wird geprüft...",
-      "success"
-    );
-
-
+    showMessage($("loginMsg"),"Login erfolgreich. Admin-Zugriff wird geprüft...","success");
     await enterAdmin();
-
-
-  }catch(error){
-
-    console.error(
-      "Gastlyo login error:",
-      error
-    );
-
-
-    let message =
-      error?.message ||
-      "Login fehlgeschlagen.";
-
-
-    if(
-      message
-        .toLowerCase()
-        .includes("invalid login credentials")
-    ){
-
-      message =
-        "E-Mail oder Passwort ist falsch.";
-
-    }
-
-
-    showMessage(
-      $("loginMsg"),
-      "Login fehlgeschlagen: " +
-      message,
-      "error"
-    );
-
-
+  }catch(e){
+    let m=e.message||"Login fehlgeschlagen.";
+    if(m.toLowerCase().includes("invalid login credentials")) m="E-Mail oder Passwort ist falsch.";
+    showMessage($("loginMsg"),"Login fehlgeschlagen: "+m,"error");
   }finally{
-
-    $("loginBtn").disabled = false;
-
-    $("loginBtn").textContent =
-      "Anmelden";
-
+    $("loginBtn").disabled=false;
+    $("loginBtn").textContent="Anmelden";
   }
-
 }
-
 
 async function enterAdmin(){
+  const restaurants=await jsonFetch(
+    `${cfg.supabaseUrl}/rest/v1/restaurants?slug=eq.${encodeURIComponent(RESTAURANT_SLUG)}&select=id,name`,
+    {headers:headers(true)}
+  );
+  const restaurant=restaurants?.[0];
+  if(!restaurant) throw new Error("Restaurant wurde nicht gefunden.");
 
-  try{
+  const memberships=await jsonFetch(
+    `${cfg.supabaseUrl}/rest/v1/restaurant_users?restaurant_id=eq.${restaurant.id}&user_id=eq.${encodeURIComponent(userId)}&select=role`,
+    {headers:headers(true)}
+  );
+  if(!memberships?.length) throw new Error("Dieses Konto ist nicht als Restaurant-Admin freigeschaltet.");
 
-    const {
-      data:userData,
-      error:userError
-    } =
-      await supabaseClient
-        .auth
-        .getUser();
-
-
-    if(userError){
-
-      throw userError;
-
-    }
-
-
-    const user =
-      userData?.user;
-
-
-    if(!user){
-
-      throw new Error(
-        "Kein angemeldeter Benutzer gefunden."
-      );
-
-    }
-
-
-    const {
-      data:restaurant,
-      error:rError
-    } =
-      await supabaseClient
-        .from("restaurants")
-        .select("id,name")
-        .eq(
-          "slug",
-          RESTAURANT_SLUG
-        )
-        .single();
-
-
-    if(rError){
-
-      throw new Error(
-        "Restaurant konnte nicht geladen werden: " +
-        rError.message
-      );
-
-    }
-
-
-    if(!restaurant){
-
-      throw new Error(
-        "Restaurant wurde nicht gefunden."
-      );
-
-    }
-
-
-    const {
-      data:membership,
-      error:mError
-    } =
-      await supabaseClient
-        .from("restaurant_users")
-        .select(
-          "restaurant_id,user_id,role"
-        )
-        .eq(
-          "restaurant_id",
-          restaurant.id
-        )
-        .eq(
-          "user_id",
-          user.id
-        )
-        .maybeSingle();
-
-
-    if(mError){
-
-      throw new Error(
-        "Admin-Berechtigung konnte nicht geprüft werden: " +
-        mError.message
-      );
-
-    }
-
-
-    if(!membership){
-
-      await supabaseClient
-        .auth
-        .signOut();
-
-
-      throw new Error(
-        "Dieses Konto ist nicht als Restaurant-Admin freigeschaltet."
-      );
-
-    }
-
-
-    restaurantId =
-      restaurant.id;
-
-
-    $("loginView")
-      .classList
-      .add("hidden");
-
-
-    $("adminView")
-      .classList
-      .remove("hidden");
-
-
-    $("logoutBtn")
-      .classList
-      .remove("hidden");
-
-
-    await loadItems();
-
-
-  }catch(error){
-
-    console.error(
-      "Gastlyo admin access error:",
-      error
-    );
-
-
-    showMessage(
-      $("loginMsg"),
-      error?.message ||
-      "Admin-Zugriff fehlgeschlagen.",
-      "error"
-    );
-
-  }
-
+  restaurantId=restaurant.id;
+  $("loginView").classList.add("hidden");
+  $("adminView").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+  await loadItems();
 }
-
 
 async function loadItems(){
-
-  clearMessage(
-    $("adminMsg")
-  );
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("menu_items")
-      .select("*")
-      .eq(
-        "restaurant_id",
-        restaurantId
-      )
-      .order(
-        "sort_order",
-        {
-          ascending:true
-        }
-      )
-      .order(
-        "external_id",
-        {
-          ascending:true
-        }
-      );
-
-
-  if(error){
-
-    showMessage(
-      $("adminMsg"),
-      "Menü konnte nicht geladen werden: " +
-      error.message,
-      "error"
-    );
-
-    return;
-
+  try{
+    clearMessage($("adminMsg"));
+    currentItems=await jsonFetch(
+      `${cfg.supabaseUrl}/rest/v1/menu_items?restaurant_id=eq.${restaurantId}&select=*&order=sort_order.asc,external_id.asc`,
+      {headers:headers(true)}
+    )||[];
+    $("itemCount").textContent=`${currentItems.length} Menüeinträge`;
+    renderItems();
+  }catch(e){
+    showMessage($("adminMsg"),"Menü konnte nicht geladen werden: "+e.message,"error");
   }
-
-
-  currentItems =
-    data || [];
-
-
-  $("itemCount").textContent =
-    `${currentItems.length} Menüeinträge`;
-
-
-  renderItems();
-
 }
-
 
 function renderItems(){
+  $("items").innerHTML=currentItems.map(item=>`
+    <article class="item">
+      <div class="item-top">
+        <div>
+          <div class="item-name">${esc(item.name)}</div>
+          <span class="badge">${esc(item.category)}</span>
+          <span class="badge ${item.available?"available":"soldout"}">${item.available?"Verfügbar":"Ausverkauft"}</span>
+        </div>
+        <div class="price">€${Number(item.price).toFixed(2)}</div>
+      </div>
+      <div style="font-size:13px;color:#6f7b75;line-height:1.5">${esc(item.description||"")}</div>
+      <div class="actions">
+        <button class="secondary" data-edit="${item.id}">Bearbeiten</button>
+        <button class="${item.available?"danger":"yellow"}" data-toggle="${item.id}">${item.available?"Ausverkauft":"Verfügbar"}</button>
+      </div>
+    </article>
+  `).join("");
 
-  $("items").innerHTML =
-    currentItems
-      .map(
-        item => `
-
-        <article class="item">
-
-          <div class="item-top">
-
-            <div>
-
-              <div class="item-name">
-                ${esc(item.name)}
-              </div>
-
-              <span class="badge">
-                ${esc(item.category)}
-              </span>
-
-              <span
-                class="
-                  badge
-                  ${
-                    item.available
-                    ? "available"
-                    : "soldout"
-                  }
-                "
-              >
-                ${
-                  item.available
-                  ? "Verfügbar"
-                  : "Ausverkauft"
-                }
-              </span>
-
-            </div>
-
-            <div class="price">
-              €${Number(item.price).toFixed(2)}
-            </div>
-
-          </div>
-
-          <div
-            style="
-              font-size:13px;
-              color:#6f7b75;
-              line-height:1.5
-            "
-          >
-            ${esc(item.description || "")}
-          </div>
-
-          <div class="actions">
-
-            <button
-              class="secondary"
-              data-edit="${item.id}"
-            >
-              Bearbeiten
-            </button>
-
-            <button
-              class="${
-                item.available
-                ? "danger"
-                : "yellow"
-              }"
-              data-toggle="${item.id}"
-            >
-              ${
-                item.available
-                ? "Ausverkauft"
-                : "Verfügbar"
-              }
-            </button>
-
-          </div>
-
-        </article>
-
-      `
-      )
-      .join("");
-
-
-  document
-    .querySelectorAll("[data-edit]")
-    .forEach(
-      button => {
-
-        button
-          .addEventListener(
-            "click",
-            () =>
-              openEdit(
-                Number(
-                  button.dataset.edit
-                )
-              )
-          );
-
-      }
-    );
-
-
-  document
-    .querySelectorAll("[data-toggle]")
-    .forEach(
-      button => {
-
-        button
-          .addEventListener(
-            "click",
-            () =>
-              toggleAvailability(
-                Number(
-                  button.dataset.toggle
-                )
-              )
-          );
-
-      }
-    );
-
+  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));
+  document.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>toggleAvailability(Number(b.dataset.toggle)));
 }
 
+async function patchItem(id,payload){
+  const r=await fetch(`${cfg.supabaseUrl}/rest/v1/menu_items?id=eq.${id}&restaurant_id=eq.${restaurantId}`,{
+    method:"PATCH",
+    headers:{...headers(true),"Prefer":"return=minimal"},
+    body:JSON.stringify(payload)
+  });
+  if(!r.ok){
+    let d=null; try{d=await r.json()}catch{}
+    throw new Error(d?.message||d?.error||`HTTP ${r.status}`);
+  }
+}
 
 async function toggleAvailability(id){
-
-  const item =
-    currentItems
-      .find(
-        item =>
-          item.id === id
-      );
-
-
-  if(!item){
-    return;
-  }
-
-
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("menu_items")
-      .update({
-        available:
-          !item.available
-      })
-      .eq(
-        "id",
-        id
-      )
-      .eq(
-        "restaurant_id",
-        restaurantId
-      );
-
-
-  if(error){
-
-    showMessage(
-      $("adminMsg"),
-      "Änderung fehlgeschlagen: " +
-      error.message,
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  await loadItems();
-
+  const item=currentItems.find(x=>x.id===id);
+  if(!item)return;
+  try{await patchItem(id,{available:!item.available});await loadItems()}
+  catch(e){showMessage($("adminMsg"),"Änderung fehlgeschlagen: "+e.message,"error")}
 }
-
 
 function openEdit(id){
-
-  const item =
-    currentItems
-      .find(
-        item =>
-          item.id === id
-      );
-
-
-  if(!item){
-    return;
-  }
-
-
-  $("editId").value =
-    item.id;
-
-
-  $("editName").value =
-    item.name || "";
-
-
-  $("editPrice").value =
-    item.price ?? "";
-
-
-  $("editDescription").value =
-    item.description || "";
-
-
-  $("editCategory").value =
-    item.category || "";
-
-
-  $("editServing").value =
-    item.serving_size || "";
-
-
-  $("editCalories").value =
-    item.calories ?? "";
-
-
-  $("editProtein").value =
-    item.protein ?? "";
-
-
-  $("editFat").value =
-    item.fat ?? "";
-
-
-  $("editCarbs").value =
-    item.carbs ?? "";
-
-
-  $("editIngredients").value =
-    Array.isArray(
-      item.ingredients
-    )
-      ? item.ingredients.join(", ")
-      : "";
-
-
-  $("editAllergens").value =
-    Array.isArray(
-      item.allergens
-    )
-      ? item.allergens.join(", ")
-      : "";
-
-
-  $("editVegetarian").checked =
-    !!item.vegetarian;
-
-
-  $("editVegan").checked =
-    !!item.vegan;
-
-
-  $("editGlutenFree").checked =
-    !!item.gluten_free;
-
-
-  $("editBestseller").checked =
-    !!item.bestseller;
-
-
-  $("editAvailable").checked =
-    !!item.available;
-
-
-  clearMessage(
-    $("editMsg")
-  );
-
-
-  $("editModal")
-    .classList
-    .remove("hidden");
-
+  const i=currentItems.find(x=>x.id===id); if(!i)return;
+  $("editId").value=i.id; $("editName").value=i.name||""; $("editPrice").value=i.price??"";
+  $("editDescription").value=i.description||""; $("editCategory").value=i.category||"";
+  $("editServing").value=i.serving_size||""; $("editCalories").value=i.calories??"";
+  $("editProtein").value=i.protein??""; $("editFat").value=i.fat??""; $("editCarbs").value=i.carbs??"";
+  $("editIngredients").value=Array.isArray(i.ingredients)?i.ingredients.join(", "):"";
+  $("editAllergens").value=Array.isArray(i.allergens)?i.allergens.join(", "):"";
+  $("editVegetarian").checked=!!i.vegetarian; $("editVegan").checked=!!i.vegan;
+  $("editGlutenFree").checked=!!i.gluten_free; $("editBestseller").checked=!!i.bestseller;
+  $("editAvailable").checked=!!i.available;
+  clearMessage($("editMsg")); $("editModal").classList.remove("hidden");
 }
 
-
-function csvToArray(value){
-
-  return value
-    .split(",")
-    .map(
-      item =>
-        item.trim()
-    )
-    .filter(Boolean);
-
-}
-
+const csv=v=>v.split(",").map(x=>x.trim()).filter(Boolean);
 
 async function saveEdit(){
-
-  const id =
-    Number(
-      $("editId").value
-    );
-
-
-  const payload = {
-
-    name:
-      $("editName")
-        .value
-        .trim(),
-
-    price:
-      Number(
-        $("editPrice")
-          .value
-      ),
-
-    description:
-      $("editDescription")
-        .value
-        .trim(),
-
-    category:
-      $("editCategory")
-        .value
-        .trim(),
-
-    serving_size:
-      $("editServing")
-        .value
-        .trim()
-        || null,
-
-    calories:
-      $("editCalories").value === ""
-        ? null
-        : Number(
-            $("editCalories").value
-          ),
-
-    protein:
-      $("editProtein").value === ""
-        ? null
-        : Number(
-            $("editProtein").value
-          ),
-
-    fat:
-      $("editFat").value === ""
-        ? null
-        : Number(
-            $("editFat").value
-          ),
-
-    carbs:
-      $("editCarbs").value === ""
-        ? null
-        : Number(
-            $("editCarbs").value
-          ),
-
-    ingredients:
-      csvToArray(
-        $("editIngredients").value
-      ),
-
-    allergens:
-      csvToArray(
-        $("editAllergens").value
-      ),
-
-    vegetarian:
-      $("editVegetarian").checked,
-
-    vegan:
-      $("editVegan").checked,
-
-    gluten_free:
-      $("editGlutenFree").checked,
-
-    bestseller:
-      $("editBestseller").checked,
-
-    available:
-      $("editAvailable").checked
-
+  const id=Number($("editId").value);
+  const payload={
+    name:$("editName").value.trim(), price:Number($("editPrice").value),
+    description:$("editDescription").value.trim(), category:$("editCategory").value.trim(),
+    serving_size:$("editServing").value.trim()||null,
+    calories:$("editCalories").value===""?null:Number($("editCalories").value),
+    protein:$("editProtein").value===""?null:Number($("editProtein").value),
+    fat:$("editFat").value===""?null:Number($("editFat").value),
+    carbs:$("editCarbs").value===""?null:Number($("editCarbs").value),
+    ingredients:csv($("editIngredients").value), allergens:csv($("editAllergens").value),
+    vegetarian:$("editVegetarian").checked, vegan:$("editVegan").checked,
+    gluten_free:$("editGlutenFree").checked, bestseller:$("editBestseller").checked,
+    available:$("editAvailable").checked
   };
+  if(!payload.name||Number.isNaN(payload.price)){showMessage($("editMsg"),"Name und Preis sind erforderlich.","error");return}
 
-
-  if(
-    !payload.name ||
-    Number.isNaN(
-      payload.price
-    )
-  ){
-
-    showMessage(
-      $("editMsg"),
-      "Name und Preis sind erforderlich.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  $("saveEdit").disabled = true;
-
-
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("menu_items")
-      .update(payload)
-      .eq(
-        "id",
-        id
-      )
-      .eq(
-        "restaurant_id",
-        restaurantId
-      );
-
-
-  $("saveEdit").disabled = false;
-
-
-  if(error){
-
-    showMessage(
-      $("editMsg"),
-      "Speichern fehlgeschlagen: " +
-      error.message,
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  $("editModal")
-    .classList
-    .add("hidden");
-
-
-  await loadItems();
-
+  $("saveEdit").disabled=true;
+  try{await patchItem(id,payload);$("editModal").classList.add("hidden");await loadItems()}
+  catch(e){showMessage($("editMsg"),"Speichern fehlgeschlagen: "+e.message,"error")}
+  finally{$("saveEdit").disabled=false}
 }
 
-
-async function logout(){
-
-  if(
-    supabaseClient
-  ){
-
-    await supabaseClient
-      .auth
-      .signOut();
-
-  }
-
-
+function logout(){
+  sessionStorage.removeItem("gastlyo_access_token");
+  sessionStorage.removeItem("gastlyo_user_id");
   location.reload();
-
 }
 
-
-$("loginBtn")
-  .addEventListener(
-    "click",
-    login
-  );
-
-
-$("password")
-  .addEventListener(
-    "keydown",
-    event => {
-
-      if(
-        event.key === "Enter"
-      ){
-
-        login();
-
-      }
-
-    }
-  );
-
-
-$("logoutBtn")
-  .addEventListener(
-    "click",
-    logout
-  );
-
-
-$("refreshBtn")
-  .addEventListener(
-    "click",
-    loadItems
-  );
-
-
-$("cancelEdit")
-  .addEventListener(
-    "click",
-    () =>
-      $("editModal")
-        .classList
-        .add("hidden")
-  );
-
-
-$("saveEdit")
-  .addEventListener(
-    "click",
-    saveEdit
-  );
-
+$("loginBtn").onclick=login;
+$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+$("logoutBtn").onclick=logout;
+$("refreshBtn").onclick=loadItems;
+$("cancelEdit").onclick=()=>$("editModal").classList.add("hidden");
+$("saveEdit").onclick=saveEdit;
 
 init();
-
 </script>
 
 </body>
