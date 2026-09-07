@@ -462,6 +462,16 @@ let currentLanguage = "en";
 let allItems = [];
 let currentCategory = "all";
 let supabaseConfig = null;
+let restaurantId = null;
+
+function getAnalyticsSessionId(){
+  let id=sessionStorage.getItem("gastlyo_analytics_session");
+  if(!id){
+    id=crypto.randomUUID();
+    sessionStorage.setItem("gastlyo_analytics_session",id);
+  }
+  return id;
+}
 
 const $ = id => document.getElementById(id);
 
@@ -513,6 +523,31 @@ async function jsonFetch(url, options={}){
   return data;
 }
 
+async function trackEvent(eventType, extra={}){
+  try{
+    if(!supabaseConfig?.supabaseUrl || !supabaseConfig?.supabaseAnonKey || !restaurantId) return;
+
+    await fetch(`${supabaseConfig.supabaseUrl}/rest/v1/analytics_events`,{
+      method:"POST",
+      headers:{
+        apikey:supabaseConfig.supabaseAnonKey,
+        "Content-Type":"application/json",
+        "Prefer":"return=minimal"
+      },
+      body:JSON.stringify({
+        restaurant_id:restaurantId,
+        event_type:eventType,
+        menu_item_id:extra.menu_item_id || null,
+        menu_item_name:extra.menu_item_name || null,
+        language:extra.language || currentLanguage,
+        session_id:getAnalyticsSessionId()
+      })
+    });
+  }catch(error){
+    console.debug("Analytics skipped:",error);
+  }
+}
+
 async function loadMenuFromSupabase(){
   showStatus("Menü wird geladen...","info");
 
@@ -537,6 +572,8 @@ async function loadMenuFromSupabase(){
     throw new Error("Restaurant not found.");
   }
 
+  restaurantId = restaurant.id;
+
   const items = await jsonFetch(
     `${supabaseConfig.supabaseUrl}/rest/v1/menu_items?restaurant_id=eq.${restaurant.id}&select=*&order=sort_order.asc,external_id.asc`,
     { headers }
@@ -546,6 +583,11 @@ async function loadMenuFromSupabase(){
   hideStatus();
   renderCategoryBar();
   renderMenu();
+
+  if(!sessionStorage.getItem("gastlyo_menu_view_tracked")){
+    sessionStorage.setItem("gastlyo_menu_view_tracked","1");
+    trackEvent("menu_view");
+  }
 }
 
 function renderCategoryBar(){
@@ -667,6 +709,8 @@ function renderMenu(){
 
       const card = document.createElement("article");
       card.className = `item ${item.available ? "" : "sold-out"}`;
+      card.dataset.analyticsItemId = item.id;
+      card.dataset.analyticsItemName = item.name;
 
       card.innerHTML = `
         <div class="item-image-wrap">
@@ -710,6 +754,13 @@ function renderMenu(){
           </div>
         </div>
       `;
+
+      card.addEventListener("click",()=>{
+        trackEvent("item_click",{
+          menu_item_id:item.id,
+          menu_item_name:item.name
+        });
+      });
 
       grid.appendChild(card);
     });
@@ -767,7 +818,8 @@ async function askWaiter(){
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         message,
-        language:currentLanguage
+        language:currentLanguage,
+        sessionId:getAnalyticsSessionId()
       })
     });
 
@@ -787,7 +839,10 @@ async function askWaiter(){
   }
 }
 
-$("languageSelect").addEventListener("change",e=>applyLanguage(e.target.value));
+$("languageSelect").addEventListener("change",e=>{
+  applyLanguage(e.target.value);
+  trackEvent("language_change",{language:e.target.value});
+});
 
 $("searchInput").addEventListener("input",renderMenu);
 
