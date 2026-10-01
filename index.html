@@ -8,7 +8,11 @@
 
   
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700;800&family=Playfair+Display+SC:wght@700&display=swap');
+/* Self-hosted fonts (no Google Fonts request) */
+@font-face{font-family:'Karla';font-style:normal;font-weight:200 800;font-display:swap;src:url('/fonts/karla-latin-ext-wght-normal.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Karla';font-style:normal;font-weight:200 800;font-display:swap;src:url('/fonts/karla-latin-wght-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Playfair Display SC';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/playfair-display-sc-latin-ext-700-normal.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Playfair Display SC';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/playfair-display-sc-latin-700-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 
 :root{
   --primary:#DC2626; --primary-dark:#991B1B; --accent:#A16207;
@@ -228,6 +232,9 @@ html[dir="rtl"] .item-top{flex-direction:row-reverse}
   .description{min-height:0}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+.legal-footer{text-align:center;padding:28px 16px 36px;font-size:13px;color:#64748b}
+.legal-footer a{color:inherit;margin:0 8px;text-decoration:none}
+.legal-footer a:hover{text-decoration:underline}
 </style>
 
 </head>
@@ -320,6 +327,10 @@ html[dir="rtl"] .item-top{flex-direction:row-reverse}
   <div id="menu"></div>
 
 </main>
+
+<footer class="legal-footer">
+  © Gastlyo · <a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a>
+</footer>
 
 <script src="i18n.js"></script>
 
