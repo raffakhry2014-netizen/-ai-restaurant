@@ -232,6 +232,7 @@ html[dir="rtl"] .item-top{flex-direction:row-reverse}
   .description{min-height:0}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+.demo-banner{background:#FDE68A;color:#451A03;text-align:center;font-size:13px;font-weight:700;padding:8px 16px;line-height:1.4}
 .legal-footer{text-align:center;padding:28px 16px 36px;font-size:13px;color:#64748b}
 .legal-footer a{color:inherit;margin:0 8px;text-decoration:none}
 .legal-footer a:hover{text-decoration:underline}
@@ -241,6 +242,8 @@ html[dir="rtl"] .item-top{flex-direction:row-reverse}
 
 <body>
 
+
+<div class="demo-banner" id="demoBanner" role="note">Demo – kein echtes Restaurant. Speisekarte, Preise und Angaben sind Beispiele.</div>
 
 <header class="site-header">
   <div class="topbar">
@@ -265,7 +268,7 @@ html[dir="rtl"] .item-top{flex-direction:row-reverse}
   </div>
 
   <section class="kiwa-hero">
-    <span class="eyebrow">Gastlyo · AI Waiter</span>
+    <span class="eyebrow" id="eyebrow">Gastlyo · AI Waiter</span>
     <h2 id="heroTitle">What would you like to eat?</h2>
     <p id="heroText">Tell KIWA what you feel like eating, your budget or dietary preferences. KIWA knows the live menu and helps you choose.</p>
 
@@ -333,6 +336,7 @@ html[dir="rtl"] .item-top{flex-direction:row-reverse}
 </footer>
 
 <script src="i18n.js"></script>
+<script src="i18n-content.js"></script>
 
 <script>
 const RESTAURANT_SLUG = "kiwan-fakhri";
@@ -378,6 +382,25 @@ function setDirection(lang){
 
 function translatedName(item){
   return I18N.itemNames?.[String(item.external_id)]?.[currentLanguage] || item.name;
+}
+
+const C = () => (window.I18N && I18N.content) || {};
+function trDescription(item){
+  if(currentLanguage==="en") return item.description || "";
+  return C().descriptions?.[item.description]?.[currentLanguage] || item.description || "";
+}
+function trList(list, dict){
+  if(!Array.isArray(list)) return [];
+  if(currentLanguage==="en") return list;
+  return list.map(x => C()[dict]?.[x]?.[currentLanguage] || x);
+}
+function listSep(){ return ["fa","ar"].includes(currentLanguage) ? "، " : ", "; }
+function trServing(s){
+  return C().serving ? C().serving(s, currentLanguage) : s;
+}
+function unit(key, fallback){
+  if(currentLanguage==="en") return fallback;
+  return C().units?.[key]?.[currentLanguage] || fallback;
 }
 
 function showStatus(text,type="info"){
@@ -518,6 +541,8 @@ function renderMenu(){
       translatedName(item),
       item.name,
       item.description,
+      trDescription(item),
+      ...trList(item.ingredients,"ingredients"),
       item.category,
       ...(Array.isArray(item.ingredients) ? item.ingredients : []),
       ...(Array.isArray(item.tags) ? item.tags : [])
@@ -570,11 +595,11 @@ function renderMenu(){
       if(item.bestseller) tags.push(info.tags.bestseller);
 
       const allergens = Array.isArray(item.allergens) && item.allergens.length
-        ? item.allergens.join(", ")
+        ? trList(item.allergens,"allergens").join(listSep())
         : info.no_allergens;
 
       const ingredients = Array.isArray(item.ingredients)
-        ? item.ingredients.join(", ")
+        ? trList(item.ingredients,"ingredients").join(listSep())
         : "";
 
       const img = item.image_url || `images/menu-${String(item.external_id).padStart(2,"0")}.webp`;
@@ -606,13 +631,13 @@ function renderMenu(){
             <span class="price">€${Number(item.price).toFixed(2)}</span>
           </div>
 
-          <div class="description">${item.description || ""}</div>
+          <div class="description">${trDescription(item)}</div>
 
           <div class="nutrition">
             🔥 ${item.calories ?? 0} kcal
-            &nbsp;•&nbsp; 💪 ${item.protein ?? 0}g
-            &nbsp;•&nbsp; ${item.fat ?? 0}g Fett
-            &nbsp;•&nbsp; ${item.carbs ?? 0}g KH
+            &nbsp;•&nbsp; 💪 ${item.protein ?? 0} g ${unit("protein","protein")}
+            &nbsp;•&nbsp; ${item.fat ?? 0} g ${unit("fat","fat")}
+            &nbsp;•&nbsp; ${item.carbs ?? 0} g ${unit("carbs","carbs")}
           </div>
 
           ${tags.length ? `
@@ -630,7 +655,7 @@ function renderMenu(){
           </div>
 
           <div class="details">
-            ${item.serving_size ? `${info.portion}: ${item.serving_size}` : ""}
+            ${item.serving_size ? `${info.portion}: ${trServing(item.serving_size)}` : ""}
             ${item.prep_time ? ` • ${info.prep}: ~${item.prep_time} ${info.minutes}` : ""}
           </div>
         </div>
@@ -697,6 +722,19 @@ function applyLanguage(lang){
   };
 
   $("searchInput").placeholder = searchPlaceholders[currentLanguage] || searchPlaceholders.en;
+
+  const demoText = {
+    de:"Demo – kein echtes Restaurant. Speisekarte, Preise und Angaben sind Beispiele.",
+    en:"Demo – not a real restaurant. Menu, prices and details are examples.",
+    fr:"Démo – ce n’est pas un vrai restaurant. Menu, prix et informations sont des exemples.",
+    es:"Demo – no es un restaurante real. Menú, precios y datos son ejemplos.",
+    it:"Demo – non è un vero ristorante. Menu, prezzi e informazioni sono esempi.",
+    tr:"Demo – gerçek bir restoran değildir. Menü, fiyatlar ve bilgiler örnektir.",
+    ar:"نسخة تجريبية – ليس مطعمًا حقيقيًا. القائمة والأسعار والمعلومات أمثلة فقط.",
+    fa:"نسخه نمایشی – این یک رستوران واقعی نیست. منو، قیمت‌ها و اطلاعات نمونه هستند."
+  };
+  $("demoBanner").textContent = demoText[currentLanguage] || demoText.en;
+  $("eyebrow").textContent = "Gastlyo · " + ({de:"KI-Kellner",en:"AI Waiter",fr:"Serveur IA",es:"Camarero IA",it:"Cameriere IA",tr:"Yapay Zekâ Garson",ar:"نادل ذكي",fa:"گارسون هوشمند"}[currentLanguage] || "AI Waiter");
 
   renderCategoryBar();
   renderMenu();
