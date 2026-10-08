@@ -682,6 +682,7 @@ $("sendOrder").addEventListener("click",()=>{if(!cartCount())return;$("orderNoti
 
 /* ---- start ---- */
 function detectLanguage(){
+  const q=new URLSearchParams(location.search).get("lang");if(q&&supportedLanguages.includes(q))return q;
   const saved=localStorage.getItem("restaurant-language");if(saved&&supportedLanguages.includes(saved))return saved;
   for(const l of (navigator.languages||[navigator.language||"en"])){const b=String(l).toLowerCase().split("-")[0];if(supportedLanguages.includes(b))return b}
   return "en";
